@@ -11,13 +11,20 @@ import seaborn as sns
 warnings.filterwarnings("ignore", category = FutureWarning)
 warnings.filterwarnings("ignore", category = DeprecationWarning)
 import plotly.express as px
-import wbdata
-import streamlit.components.v1 as components
 
 data = pd.read_csv('backup.csv')
 
 st.set_page_config(page_title="My App", page_icon=":rocket:", layout="wide", initial_sidebar_state="expanded")
+page_bg_img = '''
+<style>
+.css-18ni7ap e8zbici2{
+    content:"Hello";
+}
+</style>
+'''
+st.markdown(page_bg_img, unsafe_allow_html=True)
 
+# Add your Streamlit app code here
 
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
@@ -201,7 +208,9 @@ def healthcare():
     pass
 
 def carbon_emissions():
-    st.title('Carbon Emission influencing Life Expectancy')
+    st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
+    h1 = px.scatter(data, x='year', y='life_expectancy', color='development_status', template='plotly_dark', hover_data=['country'], width=1100)
+    st.plotly_chart(h1)
     tempDF = data[data['year'] > 2000]
     mean_value = data['schooling'].mean()
     data['schooling'] = data['schooling'].fillna(value=mean_value)
