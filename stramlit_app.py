@@ -34,10 +34,12 @@ def homepage():
                     locations='country', 
                     locationmode='country names', 
                     color='life_expectancy', 
-                    range_color=[20, 90], title="Chloropeth Chart to show Life Expectancy around world from 1960 to 2020"
+                    range_color=[20, 90], title="Chloropeth Chart to show Life Expectancy around world from 1960 to 2020", projection='natural earth'
    )
     #Add some additional layout options
-    fig.update_layout(geo=dict(showframe=False, showcoastlines=False,
+    fig.update_layout(geo=dict(showframe=False,         
+                            showcoastlines=False,
+                            bgcolor='rgba(0,0,0,0)',
                             projection_type='equirectangular'))
     
     # Show the figure
@@ -209,8 +211,36 @@ def healthcare():
 
 def carbon_emissions():
     st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
-    h1 = px.scatter(data, x='year', y='life_expectancy', color='development_status', template='plotly_dark', hover_data=['country'], width=1100)
+
+    u1, u2 = st.columns([1,1])
+    with u1:
+        mean_gdp = data.groupby('development_status')['GDP_per_capita'].mean().reset_index().sort_values(by='GDP_per_capita')
+        # Create bar chart
+        h0 = px.bar(mean_gdp, x='development_status', y='GDP_per_capita', log_y=True,
+                color='development_status', text='GDP_per_capita',
+                labels={'GDP_per_capita':'Mean GDP per capita'},
+                title='Mean GDP per capita by development status')
+        st.plotly_chart(h0)
+
+    # Filter data to only include life expectancy and development status columns
+
+    with u2:
+        life_exp_data = data[['development_status', 'life_expectancy']]
+
+        # Create violin plot using Plotly Express
+        h7 = px.violin(life_exp_data, template='plotly_dark',x='development_status', y='life_expectancy', box=True, points='all',
+
+                    labels={'development_status': 'Development Status', 'life_expectancy': 'Life Expectancy'},
+                    color='development_status')
+
+        # Customize violin plot colors
+        h7.update_traces(marker={'size': 5, 'opacity': 0.8}, showlegend=False)
+        # Show plot
+        st.plotly_chart(h7)
+
+    h1 = px.scatter(data, x='year', y='GDP_per_capita',log_y=True ,color='development_status', template='plotly_dark', hover_data=['country'], width=1100)
     st.plotly_chart(h1)
+
     tempDF = data[data['year'] > 2000]
     mean_value = data['schooling'].mean()
     data['schooling'] = data['schooling'].fillna(value=mean_value)
