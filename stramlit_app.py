@@ -327,46 +327,48 @@ def ml_model():
 
     st.title('Life Expectancy Prediction')
     
-    # Collect user input
-    healthcare_spending = st.slider('Healthcare spending (as % of GDP)', 0, 100, 10)
-    GDP_per_capita = st.slider('GDP per capita (in US dollars)', 0, 100000, 5000)
-    obesity_prevalence = st.slider('Obesity prevalence (as % of population)', 0, 100, 20)
-    carbon_emissions = st.slider('Carbon emissions (in metric tons per capita)', 0, 30, 5)
-    schooling = st.slider('Schooling (in years)', 0, 30, 10)
-    physicians = st.slider('Number of physicians per 1000 population', 0, 10, 2)
-    sanitation_mortality_rate = st.slider('Sanitation mortality rate (per 1000 population)', 0, 10, 2)
-    urban_population = st.slider('Urban population (as % of total population)', 0, 100, 50)
-    rural_population = st.slider('Rural population (as % of total population)', 0, 100, 50)
-    sanitation_population_perct = st.slider('Sanitation population percent (as % of total population)', 0, 100, 50)
-    unemployment_perct = st.slider('Unemployment percent (as % of total labor force)', 0, 50, 10)
-    mobile_cell_subs = st.slider('Mobile cellular subscriptions (per 100 people)', 0, 200, 50)
-    GINI_index = st.slider('GINI index (measure of income inequality)', 0, 100, 50)
+        # Collect user input
+    healthcare_spending = st.number_input('Healthcare spending (as % of GDP)', min_value=0, max_value=100, value=10)
+    GDP_per_capita = st.number_input('GDP per capita (in US dollars)', min_value=0, max_value=100000, value=5000)
+    obesity_prevalence = st.number_input('Obesity prevalence (as % of population)', min_value=0, max_value=100, value=20)
+    carbon_emissions = st.number_input('Carbon emissions (in metric tons per capita)', min_value=0, max_value=30, value=5)
+    schooling = st.number_input('Schooling (in years)', min_value=0, max_value=30, value=10)
+    physicians = st.number_input('Number of physicians per 1000 population', min_value=0, max_value=10, value=2)
+    sanitation_mortality_rate = st.number_input('Sanitation mortality rate (per 1000 population)', min_value=0, max_value=10, value=2)
+    urban_population = st.number_input('Urban population (as % of total population)', min_value=0, max_value=100, value=50)
+    rural_population = st.number_input('Rural population (as % of total population)', min_value=0, max_value=100, value=50)
+    sanitation_population_perct = st.number_input('Sanitation population percent (as % of total population)', min_value=0, max_value=100, value=50)
+    unemployment_perct = st.number_input('Unemployment percent (as % of total labor force)', min_value=0, max_value=50, value=10)
+    mobile_cell_subs = st.number_input('Mobile cellular subscriptions (per 100 people)', min_value=0, max_value=200, value=50)
+    GINI_index = st.number_input('GINI index (measure of income inequality)', min_value=0, max_value=100, value=50)
 
-    # Create input DataFrame from user input    
-    input_data = pd.DataFrame({
-    'healthcare_spending': healthcare_spending,
-    'GDP_per_capita': GDP_per_capita,
-    'obesity_prevalence': obesity_prevalence,
-    'carbon_emissions': carbon_emissions,
-    'schooling': schooling,
-    'physicians': physicians,
-    'sanitation_mortality_rate': sanitation_mortality_rate,
-    'urban_population': urban_population,
-    'rural_population': rural_population,
-    'sanitation_population_perct': sanitation_population_perct,
-    'unemployment_perct': unemployment_perct,
-    'mobile_cell_subs': mobile_cell_subs,
-    'GINI_index': GINI_index
-    }, index=[0])
+    submit_button = st.button('Submit')
+    if submit_button:
+        # Create input DataFrame from user input    
+        input_data = pd.DataFrame({
+        'healthcare_spending': healthcare_spending,
+        'GDP_per_capita': GDP_per_capita,
+        'obesity_prevalence': obesity_prevalence,
+        'carbon_emissions': carbon_emissions,
+        'schooling': schooling,
+        'physicians': physicians,
+        'sanitation_mortality_rate': sanitation_mortality_rate,
+        'urban_population': urban_population,
+        'rural_population': rural_population,
+        'sanitation_population_perct': sanitation_population_perct,
+        'unemployment_perct': unemployment_perct,
+        'mobile_cell_subs': mobile_cell_subs,
+        'GINI_index': GINI_index
+        }, index=[0])
 
-    # Scale numerical features using StandardScaler
-    input_data[num_features] = scaler.transform(input_data[num_features])
+        # Scale numerical features using StandardScaler
+        input_data[num_features] = scaler.transform(input_data[num_features])
 
-    # Make predictions
-    prediction = rf.predict(input_data)[0]
+        # Make predictions
+        prediction = rf.predict(input_data)[0]
 
-    # Display prediction
-    st.write('Predicted life expectancy:', round(prediction, 2))
+        # Display prediction
+        st.write('Predicted life expectancy:', round(prediction, 2))
 
 
 # Set up navigation
