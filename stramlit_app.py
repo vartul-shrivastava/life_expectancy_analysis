@@ -74,7 +74,7 @@ def gender():
     countries = st.multiselect('Select countries', data['country'].unique(), default=['India','China'])
     filtered_data = data[data['country'].isin(countries)]
 
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([1, 3])
 
     # In the first column, display the dynamic table
     with col1:
@@ -91,9 +91,17 @@ def gender():
 
     #graph 1
     
-    grouped_data = data.groupby(['country', 'year']).mean().reset_index()
-    d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Life Expectancy Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
-    st.plotly_chart(d1)
+    kol1, kol2 = st.columns([1.5, 2])
+    with kol2:
+        grouped_data = data.groupby(['country', 'year']).mean().reset_index()
+
+        d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Life Expectancy Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
+        st.plotly_chart(d1)
+    
+    with kol1:
+        st.markdown('As it will be overwhelming to show dataset from 1960 to 2020. Here is the glimpse of 2020 :)')
+        kol2_data = grouped_data[grouped_data['year'] == 2000].reset_index()
+        st.dataframe(kol2_data[['country','male_life_expectancy', 'female_life_expectancy']])
 
     st.markdown("""
     ##### __Nation-wise Inferences from the above graph__
