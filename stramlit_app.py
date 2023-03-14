@@ -1,4 +1,7 @@
 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -297,14 +300,85 @@ def corr_matrix():
     15. `GINI_index` (SI.POV.GINI) - A measure of income inequality within a country, with values ranging from 0 (perfect equality) to 100 (perfect inequality).
     """)
 
+def ml_model():
+    data = pd.read_csv('backup.csv')
+    # Clean data by filling missing values with mean
+    data = data.fillna(data.mean())
+    # Split data into training and test sets
+    X = data.drop(['country', 'year', 'life_expectancy', 'male_life_expectancy','female_life_expectancy','development_status'], axis=1)
+    y = data['life_expectancy']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train = X_train.drop('Unnamed: 0', axis=1)
+    X_test = X_test.drop('Unnamed: 0', axis=1)
+    # Scale numerical features using StandardScaler
+    scaler = StandardScaler()
+    num_features = ['healthcare_spending',          
+                    'GDP_per_capita',
+                    'obesity_prevalence', 'carbon_emissions', 'schooling', 'physicians', 'sanitation_mortality_rate',
+                    'urban_population', 'rural_population', 'sanitation_population_perct', 'unemployment_perct',
+                    'mobile_cell_subs', 'GINI_index']
+    
+    X_train[num_features] = scaler.fit_transform(X_train[num_features])
+    X_test[num_features] = scaler.transform(X_test[num_features])
+
+    # Fit Random Forest Regressor model
+    rf = RandomForestRegressor(n_estimators=100, random_state=42)
+    rf.fit(X_train, y_train)
+
+    st.title('Life Expectancy Prediction')
+    
+    # Collect user input
+    healthcare_spending = st.slider('Healthcare spending (as % of GDP)', 0, 100, 10)
+    GDP_per_capita = st.slider('GDP per capita (in US dollars)', 0, 100000, 5000)
+    obesity_prevalence = st.slider('Obesity prevalence (as % of population)', 0, 100, 20)
+    carbon_emissions = st.slider('Carbon emissions (in metric tons per capita)', 0, 30, 5)
+    schooling = st.slider('Schooling (in years)', 0, 30, 10)
+    physicians = st.slider('Number of physicians per 1000 population', 0, 10, 2)
+    sanitation_mortality_rate = st.slider('Sanitation mortality rate (per 1000 population)', 0, 10, 2)
+    urban_population = st.slider('Urban population (as % of total population)', 0, 100, 50)
+    rural_population = st.slider('Rural population (as % of total population)', 0, 100, 50)
+    sanitation_population_perct = st.slider('Sanitation population percent (as % of total population)', 0, 100, 50)
+    unemployment_perct = st.slider('Unemployment percent (as % of total labor force)', 0, 50, 10)
+    mobile_cell_subs = st.slider('Mobile cellular subscriptions (per 100 people)', 0, 200, 50)
+    GINI_index = st.slider('GINI index (measure of income inequality)', 0, 100, 50)
+
+    # Create input DataFrame from user input    
+    input_data = pd.DataFrame({
+    'healthcare_spending': healthcare_spending,
+    'GDP_per_capita': GDP_per_capita,
+    'obesity_prevalence': obesity_prevalence,
+    'carbon_emissions': carbon_emissions,
+    'schooling': schooling,
+    'physicians': physicians,
+    'sanitation_mortality_rate': sanitation_mortality_rate,
+    'urban_population': urban_population,
+    'rural_population': rural_population,
+    'sanitation_population_perct': sanitation_population_perct,
+    'unemployment_perct': unemployment_perct,
+    'mobile_cell_subs': mobile_cell_subs,
+    'GINI_index': GINI_index
+    }, index=[0])
+
+    # Scale numerical features using StandardScaler
+    input_data[num_features] = scaler.transform(input_data[num_features])
+
+    # Make predictions
+    prediction = rf.predict(input_data)[0]
+
+    # Display prediction
+    st.write('Predicted life expectancy:', round(prediction, 2))
+
+
 # Set up navigation
-nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Covid-19 Affecting Life Expectancy","About Us","Component"])
+nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Covid-19 Affecting Life Expectancy","About Us","Component","ML Model"])
 
 # Show appropriate page based on selection
 if nav == "Home":
     homepage()
 elif nav == "Relevant Features of Dataset":
     corr_matrix()
+elif nav == "ML Model":
+    ml_model()
 elif nav == "About Us":
     about()
 elif nav == "Gender and Life Expectancy":
