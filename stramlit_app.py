@@ -69,6 +69,12 @@ def gender():
 
     st.title("Using Gender as Proxy for Life Expectancy")
     st.write()
+    st.markdown("""
+    By analyzing the trends and patterns in life expectancy curves over time, we can gain insights into major world events and their impact on global health. 
+
+    Similarly, the sharp decline in life expectancy during the AIDS epidemic in the 1980s and 1990s was a reflection of the devastating impact of the disease on communities around the world. More recently, the COVID-19 pandemic has caused a significant increase in mortality rates, particularly among older adults and those with underlying health conditions.
+
+    """)
     st.markdown("Use the dropdown to compare life expectancy of various countries:")
     # Create dropdown for country selection
     countries = st.multiselect('Select countries', data['country'].unique(), default=['India','China'])
@@ -90,7 +96,7 @@ def gender():
         st.plotly_chart(fig)
 
     #graph 1
-    
+    st.markdown("The reason for the greater life expectancy of females as compared to males can be attributed to multiple factors, such as biology, lifestyle, and societal factors. Biological factors include differences in hormonal makeup, genetics, and immune systems, with females generally having a stronger immune system than males. Lifestyle factors such as diet, exercise, and smoking can also have an impact on life expectancy, with women typically having healthier lifestyle choices. Additionally, societal factors such as occupation, access to healthcare, and cultural norms can also influence life expectancy. Overall, while the exact reasons for the difference in life expectancy between males and females may vary depending on the context, it is clear that there are a multitude of factors that contribute to this difference.")
     kol1, kol2 = st.columns([1.5, 2])
     with kol2:
         grouped_data = data.groupby(['country', 'year']).mean().reset_index()
@@ -113,10 +119,24 @@ def gender():
     """)
 
     #graph 2
-    life_expectancy = pd.melt(data, id_vars=['country', 'development_status'], value_vars=['male_life_expectancy', 'female_life_expectancy'], var_name='gender', value_name='life_expectancy')
-    d2 = px.box(life_expectancy, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
-    d2.update_layout(title='Comparison of Male and Female Life Expectancy by Development Status', xaxis_title='Life Expectancy', yaxis_title='Development Status')
-    st.plotly_chart(d2)
+    ref1, ref2 = st.columns([1,1])
+    with ref2:
+        life_expectancy = pd.melt(data, id_vars=['country', 'development_status'], value_vars=['male_life_expectancy', 'female_life_expectancy'], var_name='gender', value_name='life_expectancy')
+        d2 = px.box(life_expectancy, height=600, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
+        d2.update_layout(title='Comparison of Male and Female Life Expectancy by Development Status', xaxis_title='Life Expectancy', yaxis_title='Development Status')
+        st.plotly_chart(d2)
+    
+    with ref1:
+        st.markdown("""
+        The dispersion of male and female life expectancy can vary across different income groups of countries. In developed countries, the difference between male and female life expectancy is generally smaller, with both genders having higher life expectancies compared to developing countries. This is attributed to better access to healthcare facilities, advanced medical technologies, and higher standards of living in developed countries.
+
+        In developing countries, the dispersion between male and female life expectancy can be significant, with females generally having higher life expectancies compared to males. This can be attributed to factors such as better access to healthcare and education for females in some developing countries, as well as cultural and social practices that favor female health and wellbeing.
+
+        In lower middle-income countries, the gap between male and female life expectancy can be larger compared to developing countries, but smaller compared to low-income countries. This can be attributed to a lack of access to healthcare facilities and education, limited access to clean water and sanitation, and higher rates of poverty and malnutrition in lower middle-income countries.
+
+        In low-income countries, the difference between male and female life expectancy is generally the largest, with females having significantly higher life expectancies compared to males. This can be attributed to a range of factors including limited access to healthcare facilities, higher rates of poverty and malnutrition, limited access to education and information, and gender inequalities that affect women's health outcomes.
+        """)
+
 
 def sanitation():
     st.title("Sanitation and Life Expectancy")
