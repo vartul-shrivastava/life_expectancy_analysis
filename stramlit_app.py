@@ -29,15 +29,15 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
     st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
-    fig = px.choropleth(data_frame=data, width=2000,
+    fig = px.choropleth(data_frame=data,
                         animation_frame='year',
-                    locations='country', 
+                    locations='country',height=700,   
                     locationmode='country names', 
                     color='life_expectancy', 
-                    range_color=[20, 90], title="Chloropeth Chart to show Life Expectancy around world from 1960 to 2020", projection='natural earth'
+                    range_color=[20, 90]
    )
     #Add some additional layout options
-    fig.update_layout(geo=dict(showframe=False,         
+    fig.update_layout(geo=dict(showframe=False,       
                             showcoastlines=False,
                             bgcolor='rgba(0,0,0,0)',
                             projection_type='equirectangular'))
