@@ -5,12 +5,14 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import warnings
+import altair as alt
 import matplotlib.pyplot as plt
 import seaborn as sns
 warnings.filterwarnings("ignore", category = FutureWarning)
 warnings.filterwarnings("ignore", category = DeprecationWarning)
 import plotly.express as px
 import wbdata
+import streamlit.components.v1 as components
 
 indicators = {'SP.DYN.LE00.IN': 'life_expectancy',
               'SP.DYN.LE00.MA.IN' : 'male_life_expectancy',
@@ -113,8 +115,29 @@ def about():
 def gender():
 
     st.title("Using Gender as Proxy for Life Expectancy")
+    st.write()
+    st.markdown("Use the dropdown to compare life expectancy of various countries:")
+    # Create dropdown for country selection
+    countries = st.multiselect('Select countries', data['country'].unique(), default=['India','China'])
+    filtered_data = data[data['country'].isin(countries)]
+
+    col1, col2 = st.columns([1, 2])
+
+    # In the first column, display the dynamic table
+    with col1:
+        if not filtered_data.empty:
+            st.write('Data used in graph:')
+            st.dataframe(filtered_data[['country', 'year', 'life_expectancy']])
+        else:
+            st.write('No data to display.')
+
+    # In the second column, display the Plotly graph
+    with col2:
+        fig = px.line(filtered_data, x='year', y='life_expectancy', color='country', title='Life Expectancy Comparison')
+        st.plotly_chart(fig)
 
     #graph 1
+    
     grouped_data = data.groupby(['country', 'year']).mean().reset_index()
     d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Life Expectancy Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
     st.plotly_chart(d1)
@@ -209,12 +232,44 @@ def carbon_emissions():
 def covid():
     pass
 
+def component():
+    imageCarouselComponent = components.declare_component("image-carousel-component", path="frontend/public")
+
+    imageUrls = [
+        "https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80",
+        "https://images.unsplash.com/photo-1610016302534-6f67f1c968d8?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1075&q=80",
+        "https://images.unsplash.com/photo-1516550893923-42d28e5677af?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=872&q=80",
+        "https://images.unsplash.com/photo-1541343672885-9be56236302a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
+        "https://images.unsplash.com/photo-1528728329032-2972f65dfb3f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
+        "https://images.unsplash.com/photo-1557744813-846c28d0d0db?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1118&q=80",
+        "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
+        "https://images.unsplash.com/photo-1595867818082-083862f3d630?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
+        "https://images.unsplash.com/photo-1622214366189-72b19cc61597?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1558180077-09f158c76707?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80",
+        "https://images.unsplash.com/photo-1520106212299-d99c443e4568?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1534430480872-3498386e7856?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
+        "https://images.unsplash.com/photo-1571317084911-8899d61cc464?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
+        "https://images.unsplash.com/photo-1624704765325-fd4868c9702e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80",
+    ]
+    selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
+
+    if selectedImageUrl is not None:
+        st.image(selectedImageUrl)
+
+def corr_matrix():
+    corr1 = px.imshow(data.corr(),text_auto=True, title='HeatMap : To show correlation in between the <b>relevant features</b>')
+    corr1.update_layout(height = 800,width = 800,)
+    st.plotly_chart(corr1)
+
 # Set up navigation
-nav = st.sidebar.radio("Navigation", ["Home", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Covid-19 Affecting Life Expectancy","About Us"])
+nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Covid-19 Affecting Life Expectancy","About Us","Component"])
 
 # Show appropriate page based on selection
 if nav == "Home":
     homepage()
+elif nav == "Relevant Features of Dataset":
+    corr_matrix()
 elif nav == "About Us":
     about()
 elif nav == "Gender and Life Expectancy":
@@ -227,5 +282,7 @@ elif nav == "Healthcare Expenditure and Life Expectancy":
     healthcare()
 elif nav == "Covid-19 Affecting Life Expectancy":
     covid()
+elif nav == "Component":
+    component()
 else:
     pass
