@@ -77,7 +77,7 @@ def gender():
     """)
     st.markdown("Use the dropdown to compare life expectancy of various countries:")
     # Create dropdown for country selection
-    countries = st.multiselect('Select countries', data['country'].unique(), default=['India','China'])
+    countries = st.multiselect('Select countries', data['country'].unique(), default=['India','China','Pakistan','Bangladesh'])
     filtered_data = data[data['country'].isin(countries)]
 
     col1, col2 = st.columns([1, 3])
