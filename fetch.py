@@ -37,28 +37,3 @@ data = data.reset_index()
 
 data.columns = ['country', 'year', 'life_expectancy', 'male_life_expectancy','female_life_expectancy', 'healthcare_spending', 'GDP_per_capita', 'obesity_prevalence', 'carbon_emissions','schooling','physicians','sanitation_mortality_rate','urban_population','rural_population','sanitation_population_perct','unemployment_perct','mobile_cell_subs','GINI_index']
 data = data.sort_values(['country', 'year'])
-
-# Define income group thresholds
-income_groups = {'High income': 12736, 
-                 'Upper middle income': 4126, 
-                 'Lower middle income': 1046, 
-                 'Low income': 0}
-
-# Define function to classify countries
-def classify_country(row):
-    gdp = row['GDP_per_capita']
-    if gdp >= income_groups['High income']:
-        return 'Developed'
-    elif gdp >= income_groups['Upper middle income']:
-        return 'Developing'
-    elif gdp >= income_groups['Lower middle income']:
-        return 'Lower middle income'
-    else:
-        return 'Low income'
-
-# Apply function to create new column
-data['development_status'] = data.apply(classify_country, axis=1)
-data['year'] = data['year'].astype('int')
-
-data.to_csv('backup.csv')
-

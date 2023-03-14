@@ -14,67 +14,20 @@ import plotly.express as px
 import wbdata
 import streamlit.components.v1 as components
 
-indicators = {'SP.DYN.LE00.IN': 'life_expectancy',
-              'SP.DYN.LE00.MA.IN' : 'male_life_expectancy',
-              'SP.DYN.LE00.FE.IN' : 'female_life_expectancy',
-              'SH.XPD.CHEX.PP.CD': 'healthcare_spending',
-              'NY.GDP.PCAP.CD': 'GDP_per_capita',
-              'SH.STA.OWAD.ZS': 'obesity_prevalence',
-              'EN.ATM.CO2E.PC': 'carbon_emissions',
-              'SE.TER.ENRR' : 'schooling',
-              'SH.MED.PHYS.ZS' : 'physicians',
-              'SH.STA.WASH.P5' : 'sanitation_mortality_rate',
-              'SP.URB.TOTL.IN.ZS' : 'urban_population',
-              'SP.RUR.TOTL.ZS' : 'rural_population',
-              'SH.STA.SMSS.ZS' : 'sanitation_population_perct',
-              'SL.UEM.TOTL.ZS' : 'unemployment_perct',
-              'IT.CEL.SETS.P2' : 'mobile_cell_subs',
-              'SI.POV.GINI' : 'GINI_index'
-}       
-
-data = wbdata.get_dataframe(indicators, country='all')
-data = data.reset_index()
-
-data.columns = ['country', 'year', 'life_expectancy', 'male_life_expectancy','female_life_expectancy', 'healthcare_spending', 'GDP_per_capita', 'obesity_prevalence', 'carbon_emissions','schooling','physicians','sanitation_mortality_rate','urban_population','rural_population','sanitation_population_perct','unemployment_perct','mobile_cell_subs','GINI_index']
-data = data.sort_values(['country', 'year'])
-
-# Define income group thresholds
-income_groups = {'High income': 12736, 
-                 'Upper middle income': 4126, 
-                 'Lower middle income': 1046, 
-                 'Low income': 0}
-
-# Define function to classify countries
-def classify_country(row):
-    gdp = row['GDP_per_capita']
-    if gdp >= income_groups['High income']:
-        return 'Developed'
-    elif gdp >= income_groups['Upper middle income']:
-        return 'Developing'
-    elif gdp >= income_groups['Lower middle income']:
-        return 'Lower middle income'
-    else:
-        return 'Low income'
-
-# Apply function to create new column
-data['development_status'] = data.apply(classify_country, axis=1)
-data.to_csv('backup.csv')
-
-data['year'] = data['year'].astype('int')
-
+data = pd.read_csv('backup.csv')
 
 st.set_page_config(page_title="My App", page_icon=":rocket:", layout="wide", initial_sidebar_state="expanded")
 
 
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
-    st.write("Welcome to the Life Expectancy Analysis webpage!")
+    st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
     fig = px.choropleth(data_frame=data, width=2000,
                         animation_frame='year',
                     locations='country', 
                     locationmode='country names', 
                     color='life_expectancy', 
-                    range_color=[20, 90],
+                    range_color=[20, 90], title="Chloropeth Chart to show Life Expectancy around world from 1960 to 2020"
    )
     #Add some additional layout options
     fig.update_layout(geo=dict(showframe=False, showcoastlines=False,
@@ -251,6 +204,7 @@ def corr_matrix():
     """)
     
     st.markdown("""
+    ##### Here is the summary of indicators analyzed:
     1. `life_expectancy` (SP.DYN.LE00.IN):The average number of years a newborn is expected to live if mortality patterns at the time of its birth remain constant in the future.
 
     2. `male_life_expectancy` (SP.DYN.LE00.MA.IN):The average number of years a newborn male is expected to live if mortality patterns at the time of his birth remain constant in the future.
