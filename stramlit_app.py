@@ -232,35 +232,57 @@ def carbon_emissions():
 def covid():
     pass
 
-def component():
-    imageCarouselComponent = components.declare_component("image-carousel-component", path="frontend/public")
-
-    imageUrls = [
-        "https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80",
-        "https://images.unsplash.com/photo-1610016302534-6f67f1c968d8?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1075&q=80",
-        "https://images.unsplash.com/photo-1516550893923-42d28e5677af?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=872&q=80",
-        "https://images.unsplash.com/photo-1541343672885-9be56236302a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80",
-        "https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
-        "https://images.unsplash.com/photo-1528728329032-2972f65dfb3f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
-        "https://images.unsplash.com/photo-1557744813-846c28d0d0db?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1118&q=80",
-        "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
-        "https://images.unsplash.com/photo-1595867818082-083862f3d630?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
-        "https://images.unsplash.com/photo-1622214366189-72b19cc61597?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80",
-        "https://images.unsplash.com/photo-1558180077-09f158c76707?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80",
-        "https://images.unsplash.com/photo-1520106212299-d99c443e4568?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80",
-        "https://images.unsplash.com/photo-1534430480872-3498386e7856?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
-        "https://images.unsplash.com/photo-1571317084911-8899d61cc464?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=870&q=80",
-        "https://images.unsplash.com/photo-1624704765325-fd4868c9702e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=764&q=80",
-    ]
-    selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
-
-    if selectedImageUrl is not None:
-        st.image(selectedImageUrl)
-
 def corr_matrix():
+    st.title('Representing Correlations between the dataset')
     corr1 = px.imshow(data.corr(),text_auto=True, title='HeatMap : To show correlation in between the <b>relevant features</b>')
-    corr1.update_layout(height = 800,width = 800,)
+    corr1.update_layout(height = 800,width = 1200,)
+    st.markdown("""
+    Upon analyzing the correlation matrix, it is evident that healthcare spending exhibits a strong positive correlation (0.64) with life expectancy. Additionally, GDP per capita (0.54) and carbon emissions (0.53) exhibit considerable correlation with life expectancy. These correlations will be further explored and visualized in the graphs to gain more insights.
+
+    Contrary to popular belief, obesity prevalence (0.72) - an obvious negative factor in decreasing life expectancy - exhibits a positive correlation with life expectancy. This suggests that there may be various other latent factors that influence life expectancy. The number of physicians per 1000 people (0.65) also has a positive correlation with life expectancy, which highlights the pivotal role of healthcare infrastructure in determining life expectancy.  
+
+    """)
+
     st.plotly_chart(corr1)
+    st.markdown("""
+    Education also plays a significant role in improving life expectancy, as evidenced by the strong positive correlation with schooling (0.72). On the other hand, mortality rate due to poor sanitation (per 1000) exhibits a negative but influential correlation (-0.84) with life expectancy. This indicates that ensuring basic sanitation facilities can significantly improve life expectancy. Furthermore, the percentage of the population migrating to urban areas (0.73) has a greater life expectancy compared to the rural population, which exhibits an inverse correlation (-0.73). 
+    
+    This highlights the importance of urbanization in improving the overall health and well-being of individuals. Lastly, the percentage of the population meeting basic sanitation (0.71) exhibits a positive correlation with life expectancy. However, unemployment (0.48), mobile cell subscription (0.50), and GINI Index (-0.36) have little to no effect on life expectancy, and therefore, may be dropped from the dataset
+    """)
+    
+    st.markdown("""
+    1. `life_expectancy` (SP.DYN.LE00.IN):The average number of years a newborn is expected to live if mortality patterns at the time of its birth remain constant in the future.
+
+    2. `male_life_expectancy` (SP.DYN.LE00.MA.IN):The average number of years a newborn male is expected to live if mortality patterns at the time of his birth remain constant in the future.
+
+    3. `female_life_expectancy` (SP.DYN.LE00.FE.IN):The average number of years a newborn female is expected to live if mortality patterns at the time of her birth remain constant in the future.
+
+    4. `healthcare_spending` (SH.XPD.CHEX.PP.CD)  Total healthcare spending, including both public and private expenditures, expressed as a percentage of GDP.
+
+    4. `GDP_per_capita` (NY.GDP.PCAP.CD):The total economic output of a country divided by its total population.
+
+    5. `obesity_prevalence` (SH.STA.OWAD.ZS): The percentage of a country's adult population with a Body Mass Index (BMI) greater than or equal to 30.
+
+    6. `carbon_emissions` (EN.ATM.CO2E.PC): The amount of carbon dioxide emitted by a country per capita.
+
+    7. `schooling` (SE.TER.ENRR): The percentage of the population of official school age who are enrolled in tertiary education.
+
+    8. `physicians` (SH.MED.PHYS.ZS): The number of physicians (including generalist and specialist medical practitioners) per 1,000 people.
+
+    9. `sanitation_mortality_rate` (SH.STA.WASH.P5) - The number of deaths of children under the age of five per 1,000 live births due to poor sanitation.
+
+    10. `urban_population` (SP.URB.TOTL.IN.ZS) - The percentage of a country's total population that lives in urban areas.
+
+    11. `rural_population` (SP.RUR.TOTL.ZS) - The percentage of a country's total population that lives in rural areas.
+
+    12. `sanitation_population_perct` (SH.STA.SMSS.ZS) - The percentage of the population with access to basic sanitation services.
+
+    13. `unemployment_perct` (SL.UEM.TOTL.ZS) - The percentage of the labor force that is unemployed.
+
+    14. `mobile_cell_subs` (IT.CEL.SETS.P2) - The number of mobile cellular telephone subscriptions per 100 people.
+
+    15. `GINI_index` (SI.POV.GINI) - A measure of income inequality within a country, with values ranging from 0 (perfect equality) to 100 (perfect inequality).
+    """)
 
 # Set up navigation
 nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Covid-19 Affecting Life Expectancy","About Us","Component"])
