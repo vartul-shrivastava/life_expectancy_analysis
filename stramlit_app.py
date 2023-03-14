@@ -15,14 +15,6 @@ import plotly.express as px
 data = pd.read_csv('backup.csv')
 
 st.set_page_config(page_title="My App", page_icon=":rocket:", layout="wide", initial_sidebar_state="expanded")
-page_bg_img = '''
-<style>
-.css-18ni7ap e8zbici2{
-    content:"Hello";
-}
-</style>
-'''
-st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Add your Streamlit app code here
 
@@ -329,3 +321,5 @@ elif nav == "Component":
     component()
 else:
     pass
+
+st.sidebar.image("web.png", use_column_width=True)
