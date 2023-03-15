@@ -221,33 +221,27 @@ def carbon_emissions():
         st.plotly_chart(cmx,use_container_width=True)
         
     with carbon2:
-        st.markdown("""There is a positive correlation between both GDP per capita and carbon emissions and life expectancy, which means that as GDP per capita and carbon emissions increase, so does life expectancy. The correlation coefficient between life expectancy and GDP per capita is +0.54, while the correlation coefficient between life expectancy and carbon emissions is +0.53. These coefficients indicate a moderate positive correlation between these variables and life expectancy. The reason why there is a positive correlation between GDP per capita and life expectancy is that higher economic output typically leads to better access to healthcare, education, and sanitation, which can improve overall health and longevity. Similarly, the positive correlation between carbon emissions and life expectancy can be explained by the fact that carbon emissions are often associated with industrialization and economic development, which can lead to improved living conditions and better access to healthcare.
+        st.markdown("""There is a positive correlation between both GDP per capita and carbon emissions and life expectancy, which means that as GDP per capita and carbon emissions increase, so does life expectancy. The correlation coefficient between life expectancy and GDP per capita is +0.54, while the correlation coefficient between life expectancy and carbon emissions is +0.53. These coefficients indicate a moderate positive correlation between these variables and life expectancy.
+        """)
+        st.markdown("""
+        The reason why there is a positive correlation between GDP per capita and life expectancy is that higher economic output typically leads to better access to healthcare, education, and sanitation, which can improve overall health and longevity. Similarly, the positive correlation between carbon emissions and life expectancy can be explained by the fact that carbon emissions are often associated with industrialization and economic development, which can lead to improved living conditions and better access to healthcare.
         """)
 
-    life_exp_data = data[['development_status', 'life_expectancy']]
+    st.markdown("""
+        This data shows a clear relationship between a country's level of development and its GDP per capita. High income countries, which are typically more developed, have a much higher mean GDP per capita than low income countries. There is also a gradual increase in mean GDP per capita as countries move up the development ladder from low income to high income.
 
-    # Create violin plot using Plotly Express
-    h7 = px.violin(life_exp_data, template='plotly_dark',x='development_status', y='life_expectancy', box=True, points='all',
-    labels={'development_status': 'Development Status', 'life_expectancy': 'Life Expectancy'}, color='development_status')
-
-    # Customize violin plot colors
-    h7.update_traces(marker={'size': 5, 'opacity': 0.8}, showlegend=False)
-    # Show plot
-    st.plotly_chart(h7, use_container_width=True)
-    u1, u2 = st.columns([1,1])
-    with u1:
-        mean_gdp = data.groupby('development_status')['GDP_per_capita'].mean().reset_index().sort_values(by='GDP_per_capita')
-        # Create bar chart
-        h0 = px.bar(mean_gdp, x='development_status', y='GDP_per_capita', log_y=True,
-                color='development_status', text='GDP_per_capita',
+        It's worth noting that GDP per capita is just one measure of a country's economic output, and there are many other factors that contribute to a country's overall development and well-being. However, GDP per capita can be a useful indicator of a country's economic health and can provide insights into the economic disparities between different countries.
+        """)
+    mean_gdp = data.groupby('development_status')['GDP_per_capita'].mean().reset_index().sort_values(by='GDP_per_capita')
+    # Create bar chart
+    h0 = px.bar(mean_gdp, x='development_status', y='GDP_per_capita', log_y=True,
+        color='development_status', text='GDP_per_capita',
                 labels={'GDP_per_capita':'Mean GDP per capita'},
                 title='Mean GDP per capita by development status')
-        st.plotly_chart(h0)
+    st.plotly_chart(h0)
 
     # Filter data to only include life expectancy and development status columns
 
-    with u2:
-        st.markdown("Sfsd")
 
     h1 = px.scatter(data, x='year',marginal_y= 'box' ,y='GDP_per_capita',log_y=True ,color='development_status',template='plotly_dark', hover_data=['country'], width=1100)
     st.plotly_chart(h1)
