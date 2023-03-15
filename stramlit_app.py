@@ -22,7 +22,7 @@ import plotly.express as px
 
 data = pd.read_csv('backup.csv')
 
-st.set_page_config(page_title="My App", page_icon=":rocket:", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="CS312 | Life Expectancy Analysis on World Bank Parameters", page_icon="./fav.png", layout="wide", initial_sidebar_state="expanded")
 
 # Add your Streamlit app code here
 st.sidebar.image("web.png", use_column_width=True)
@@ -209,9 +209,6 @@ def sanitation():
                              tickfont=dict(family='Arial', size=14)))
     st.plotly_chart(s2)
 
-def healthcare():
-    pass
-
 def carbon_emissions():
     st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
     carbon1, carbon2 = st.columns([0.8,1])
@@ -232,27 +229,59 @@ def carbon_emissions():
 
         It's worth noting that GDP per capita is just one measure of a country's economic output, and there are many other factors that contribute to a country's overall development and well-being. However, GDP per capita can be a useful indicator of a country's economic health and can provide insights into the economic disparities between different countries.
         """)
+    
     mean_gdp = data.groupby('development_status')['GDP_per_capita'].mean().reset_index().sort_values(by='GDP_per_capita')
-    # Create bar chart
-    h0 = px.bar(mean_gdp, x='development_status', y='GDP_per_capita', log_y=True,
-        color='development_status', text='GDP_per_capita',
-                labels={'GDP_per_capita':'Mean GDP per capita'},
-                title='Mean GDP per capita by development status')
-    st.plotly_chart(h0)
+    median_gdp = data.groupby('development_status')['GDP_per_capita'].median().reset_index().sort_values(by='GDP_per_capita')
 
-    # Filter data to only include life expectancy and development status columns
+    # Create grouped bar chart with mean and median bars
+    fig = px.bar(data_frame=data, x='development_status', y='GDP_per_capita', log_y=True, 
+                color='development_status', labels={'GDP_per_capita':'GDP per capita'},
+                title='Mean and Median GDP per capita by development status')
 
+    # Add mean bars
+    import plotly.graph_objs as go
 
-    h1 = px.scatter(data, x='year',marginal_y= 'box' ,y='GDP_per_capita',log_y=True ,color='development_status',template='plotly_dark', hover_data=['country'], width=1100)
-    st.plotly_chart(h1)
+# Calculate mean and median GDP per capita by development status
+    gdp_stats = data.groupby('development_status')['GDP_per_capita'].agg(['mean', 'median']).reset_index()
+    gdp_stats = gdp_stats.sort_values(by='median')
 
+# Create grouped bar chart
+    fig = go.Figure(data=[
+    go.Bar(name='Mean', x=gdp_stats['development_status'], y=gdp_stats['mean'], text=gdp_stats['mean'],
+           marker_color='lightskyblue'),
+    go.Bar(name='Median', x=gdp_stats['development_status'], y=gdp_stats['median'], text=gdp_stats['median'],
+           marker_color='gold')
+    ])
+
+    fig.update_layout(
+    xaxis=dict(title='Development status'),
+    yaxis=dict(title='GDP per capita', type='log'),
+    barmode='group',
+    title='Mean and Median GDP per capita by development status'
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
     tempDF = data[data['year'] > 2000]
     mean_value = data['schooling'].mean()
     data['schooling'] = data['schooling'].fillna(value=mean_value)
     c1 = px.scatter(tempDF, x="carbon_emissions", y="life_expectancy", color="development_status", template='plotly_dark',
                  title="<i>After 2000</i> | Relationship Between <b>Life Expectancy and Carbon Emissions</b> Per Capita by Development Status", log_x=True, width=1100,
                  marginal_y='histogram')
-    st.plotly_chart(c1)
+    st.plotly_chart(c1, use_container_width=True)
+
+    st.markdown("""
+    Low income countries have the lowest mean and median GDP per capita among all categories. This indicates that these countries have a relatively low level of economic development and are likely to face significant challenges in improving the standard of living of their citizens.
+
+    Low-middle income countries have a higher mean and median GDP per capita than low income countries but lower than developing and developed countries. This suggests that these countries have made some progress in economic development, but they still have a long way to go to catch up with more developed economies.
+
+    Developing countries have a higher mean and median GDP per capita than low-middle income countries, indicating that these countries have achieved a higher level of economic development. However, the gap between developing and developed countries remains significant, and many challenges still need to be addressed, such as poverty, inequality, and access to basic services.
+
+    Developed countries have the highest mean and median GDP per capita among all categories, indicating that they have achieved a high level of economic development and prosperity. However, it is worth noting that even within developed countries, there can be significant disparities in income and wealth, and issues such as income inequality and social exclusion remain significant challenges in many developed economies.
+    """)
+
+    h1 = px.scatter(data, x='year',marginal_y= 'box' ,y='GDP_per_capita',log_y=True ,color='development_status',template='plotly_dark', hover_data=['country'], width=1100)
+    st.plotly_chart(h1,use_container_width=True)
+
     
 def obesity_prevalence():
         st.title('Obesity Prevalence and Life Expectancy')
@@ -452,7 +481,7 @@ def schooling():
         st.plotly_chart(cmx)
 
 # Set up navigation
-nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","Component","ML Model"])
+nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","ML Model"])
 
 # Show appropriate page based on selection
 if nav == "Home":
@@ -471,8 +500,6 @@ elif nav == "Carbon Emissions and Life Expectancy":
     carbon_emissions()
 elif nav == "Sanitation and Life Expectancy":
     sanitation()
-elif nav == "Healthcare Expenditure and Life Expectancy":
-    healthcare()
 elif nav == "Obesity Prevalence and Life Expectancy":
     obesity_prevalence()
 else:
