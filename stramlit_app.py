@@ -21,18 +21,22 @@ warnings.filterwarnings("ignore", category = DeprecationWarning)
 import plotly.express as px
 
 data = pd.read_csv('backup.csv')
+
+
 st.set_page_config(page_title="CS312 | Life Expectancy Analysis on World Bank Parameters", page_icon="./fav.png", layout="wide", initial_sidebar_state="expanded")
 hide = """
 <style>
-#MainMenu {visibility: hidden;}
 footer {visibility: hidden}
 </style>
 """
 st.markdown(hide, unsafe_allow_html=True)
 
+st.sidebar.image("iiitv.png", use_column_width=True)
+
+
 
 # Add your Streamlit app code here
-st.sidebar.image("web.png", use_column_width=True)
+
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
     st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
@@ -511,4 +515,5 @@ elif nav == "Obesity Prevalence and Life Expectancy":
     obesity_prevalence()
 else:
     pass
+st.sidebar.image("web.png", use_column_width=True)
 
