@@ -1,5 +1,10 @@
 
+import pickle
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import streamlit as st
@@ -20,7 +25,7 @@ data = pd.read_csv('backup.csv')
 st.set_page_config(page_title="My App", page_icon=":rocket:", layout="wide", initial_sidebar_state="expanded")
 
 # Add your Streamlit app code here
-
+st.sidebar.image("web.png", use_column_width=True)
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
     st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
@@ -90,28 +95,35 @@ def gender():
     with col1:
         if not filtered_data.empty:
             st.write('Data used in graph:')
-            st.dataframe(filtered_data[['country', 'year', 'life_expectancy']])
+            st.dataframe(filtered_data[['country', 'year', 'life_expectancy']],use_container_width=True)
         else:
             st.write('No data to display.')
 
     # In the second column, display the Plotly graph
     with col2:
         fig = px.line(filtered_data, x='year', y='life_expectancy', color='country', title='Life Expectancy Comparison')
-        st.plotly_chart(fig)
+        st.plotly_chart(fig,use_container_width=True)
 
     #graph 1
     st.markdown("The reason for the greater life expectancy of females as compared to males can be attributed to multiple factors, such as biology, lifestyle, and societal factors. Biological factors include differences in hormonal makeup, genetics, and immune systems, with females generally having a stronger immune system than males. Lifestyle factors such as diet, exercise, and smoking can also have an impact on life expectancy, with women typically having healthier lifestyle choices. Additionally, societal factors such as occupation, access to healthcare, and cultural norms can also influence life expectancy. Overall, while the exact reasons for the difference in life expectancy between males and females may vary depending on the context, it is clear that there are a multitude of factors that contribute to this difference.")
-    kol1, kol2 = st.columns([1.5, 2])
+    kol1, kol2 = st.columns([1, 2])
     with kol2:
         grouped_data = data.groupby(['country', 'year']).mean().reset_index()
-
         d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Life Expectancy Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
-        st.plotly_chart(d1)
+        d1.update_layout(
+            legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.02,
+            xanchor='left',
+            x=0
+            ))
+        st.plotly_chart(d1,use_container_width=True)
     
     with kol1:
         st.markdown('As it will be overwhelming to show dataset from 1960 to 2020. Here is the glimpse of 2020 :)')
         kol2_data = grouped_data[grouped_data['year'] == 2000].reset_index()
-        st.dataframe(kol2_data[['country','male_life_expectancy', 'female_life_expectancy']])
+        st.dataframe(kol2_data[['country','male_life_expectancy', 'female_life_expectancy']],use_container_width=True)
 
     st.markdown("""
     ##### __Nation-wise Inferences from the above graph__
@@ -122,16 +134,12 @@ def gender():
     - The fragmentation of Soviet Union in 1990s caused low life expectancy in Russia for the years upcoming. And due to constant poor diet in the country, its life expectancy remained stagnant especially for the male counterparts.
     """)
 
-    #graph 2
-    ref1, ref2 = st.columns([1,1])
-    with ref2:
-        life_expectancy = pd.melt(data, id_vars=['country', 'development_status'], value_vars=['male_life_expectancy', 'female_life_expectancy'], var_name='gender', value_name='life_expectancy')
-        d2 = px.box(life_expectancy, height=600, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
-        d2.update_layout(title='Comparison of Male and Female Life Expectancy by Development Status', xaxis_title='Life Expectancy', yaxis_title='Development Status')
-        st.plotly_chart(d2)
+    life_expectancy = pd.melt(data, id_vars=['country', 'development_status'], value_vars=['male_life_expectancy', 'female_life_expectancy'], var_name='gender', value_name='life_expectancy')
+    d2 = px.box(life_expectancy, height=600, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
+    d2.update_layout(title='Comparison of Male and Female Life Expectancy by Development Status', xaxis_title='Life Expectancy', yaxis_title='Development Status')
+    st.plotly_chart(d2,use_container_width=True)
     
-    with ref1:
-        st.markdown("""
+    st.markdown("""
         The dispersion of male and female life expectancy can vary across different income groups of countries. In developed countries, the difference between male and female life expectancy is generally smaller, with both genders having higher life expectancies compared to developing countries. This is attributed to better access to healthcare facilities, advanced medical technologies, and higher standards of living in developed countries.
 
         In developing countries, the dispersion between male and female life expectancy can be significant, with females generally having higher life expectancies compared to males. This can be attributed to factors such as better access to healthcare and education for females in some developing countries, as well as cultural and social practices that favor female health and wellbeing.
@@ -206,7 +214,26 @@ def healthcare():
 
 def carbon_emissions():
     st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
+    carbon1, carbon2 = st.columns([0.8,1])
+    with carbon1:
+        cmx = px.imshow(data[['life_expectancy','GDP_per_capita','carbon_emissions']].corr(),text_auto=True, width=400)
+        cmx.update_layout(coloraxis_colorbar=dict(x=.4, y=1.2, len=0.8, yanchor='top', orientation='h'))
+        st.plotly_chart(cmx,use_container_width=True)
+        
+    with carbon2:
+        st.markdown("""There is a positive correlation between both GDP per capita and carbon emissions and life expectancy, which means that as GDP per capita and carbon emissions increase, so does life expectancy. The correlation coefficient between life expectancy and GDP per capita is +0.54, while the correlation coefficient between life expectancy and carbon emissions is +0.53. These coefficients indicate a moderate positive correlation between these variables and life expectancy. The reason why there is a positive correlation between GDP per capita and life expectancy is that higher economic output typically leads to better access to healthcare, education, and sanitation, which can improve overall health and longevity. Similarly, the positive correlation between carbon emissions and life expectancy can be explained by the fact that carbon emissions are often associated with industrialization and economic development, which can lead to improved living conditions and better access to healthcare.
+        """)
 
+    life_exp_data = data[['development_status', 'life_expectancy']]
+
+    # Create violin plot using Plotly Express
+    h7 = px.violin(life_exp_data, template='plotly_dark',x='development_status', y='life_expectancy', box=True, points='all',
+    labels={'development_status': 'Development Status', 'life_expectancy': 'Life Expectancy'}, color='development_status')
+
+    # Customize violin plot colors
+    h7.update_traces(marker={'size': 5, 'opacity': 0.8}, showlegend=False)
+    # Show plot
+    st.plotly_chart(h7, use_container_width=True)
     u1, u2 = st.columns([1,1])
     with u1:
         mean_gdp = data.groupby('development_status')['GDP_per_capita'].mean().reset_index().sort_values(by='GDP_per_capita')
@@ -220,20 +247,9 @@ def carbon_emissions():
     # Filter data to only include life expectancy and development status columns
 
     with u2:
-        life_exp_data = data[['development_status', 'life_expectancy']]
+        st.markdown("Sfsd")
 
-        # Create violin plot using Plotly Express
-        h7 = px.violin(life_exp_data, template='plotly_dark',x='development_status', y='life_expectancy', box=True, points='all',
-
-                    labels={'development_status': 'Development Status', 'life_expectancy': 'Life Expectancy'},
-                    color='development_status')
-
-        # Customize violin plot colors
-        h7.update_traces(marker={'size': 5, 'opacity': 0.8}, showlegend=False)
-        # Show plot
-        st.plotly_chart(h7)
-
-    h1 = px.scatter(data, x='year', y='GDP_per_capita',log_y=True ,color='development_status', template='plotly_dark', hover_data=['country'], width=1100)
+    h1 = px.scatter(data, x='year',marginal_y= 'box' ,y='GDP_per_capita',log_y=True ,color='development_status',template='plotly_dark', hover_data=['country'], width=1100)
     st.plotly_chart(h1)
 
     tempDF = data[data['year'] > 2000]
@@ -241,11 +257,52 @@ def carbon_emissions():
     data['schooling'] = data['schooling'].fillna(value=mean_value)
     c1 = px.scatter(tempDF, x="carbon_emissions", y="life_expectancy", color="development_status", template='plotly_dark',
                  title="<i>After 2000</i> | Relationship Between <b>Life Expectancy and Carbon Emissions</b> Per Capita by Development Status", log_x=True, width=1100,
-                 marginal_x='histogram', marginal_y='histogram')
+                 marginal_y='histogram')
     st.plotly_chart(c1)
     
-def covid():
-    pass
+def obesity_prevalence():
+        st.title('Obesity Prevalence and Life Expectancy')
+        o1, o0, o2 = st.columns([1.2,0.1,1])
+        o1.markdown("""
+        <style>
+        div.stColumn:first-child {
+            margin-right: 30px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True)
+        with o1:
+            fig = px.histogram(data, x='obesity_prevalence', histnorm='density', color='development_status', marginal='rug')
+            fig.update_layout(
+            legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.02,
+            xanchor='left',
+            x=0
+            ))
+            st.plotly_chart(fig)
+        with o0:
+            st.markdown("     ")
+        with o2:
+            cmx = px.imshow(data[['life_expectancy','GDP_per_capita','obesity_prevalence']].corr(),text_auto=True, width=400)
+            cmx.update_layout(coloraxis_colorbar=dict(x=.4, y=1.2, len=0.8, yanchor='top', orientation='h'))
+            st.plotly_chart(cmx)
+
+        st.markdown("""
+        There is a positive correlation of 0.72 between obesity prevalence and life expectancy, indicating that there is a moderate relationship between the two variables. This means that as obesity prevalence increases, so does life expectancy. 
+        
+        This may seem counterintuitive, but it could be due to the fact that some of the factors that lead to higher obesity prevalence, such as access to better healthcare and a higher standard of living, may also lead to higher life expectancy.""")
+
+        df1 = data.copy()
+        df1 = df1.dropna(subset=['obesity_prevalence'])
+        fig = px.scatter(df1,template='plotly_dark', x='GDP_per_capita', y='life_expectancy', size='obesity_prevalence',
+                        color='obesity_prevalence', trendline='ols', hover_name='country',
+                        log_x=True, size_max=30, title="Analyzing <b>Obesity Prevalance</b> with GDP per capita and Life Expectancy")
+        st.plotly_chart(fig,use_container_width=True)
+        st.markdown("""
+               In terms of differences between development status categories, we can see that obesity prevalence is generally highest in developed countries, followed by developing, lower middle income, and low-income countries, in that order. This trend is consistent across all years in the dataset. The density plots show that obesity prevalence in developed countries is more spread out and has a higher peak compared to other development status categories, indicating that there are more people in developed countries who are severely obese.
+        """)
 
 def corr_matrix():
     st.title('Representing Correlations between the dataset')
@@ -258,7 +315,7 @@ def corr_matrix():
 
     """)
 
-    st.plotly_chart(corr1)
+    st.plotly_chart(corr1,use_container_width=True)
     st.markdown("""
     Education also plays a significant role in improving life expectancy, as evidenced by the strong positive correlation with schooling (0.72). On the other hand, mortality rate due to poor sanitation (per 1000) exhibits a negative but influential correlation (-0.84) with life expectancy. This indicates that ensuring basic sanitation facilities can significantly improve life expectancy. Furthermore, the percentage of the population migrating to urban areas (0.73) has a greater life expectancy compared to the rural population, which exhibits an inverse correlation (-0.73). 
     
@@ -303,7 +360,31 @@ def corr_matrix():
 def ml_model():
     data = pd.read_csv('backup.csv')
     # Clean data by filling missing values with mean
-    data = data.fillna(data.mean())
+    # Define function to impute missing values using linear regression
+    def impute_linear_regression(data):
+        # Create a copy of the group DataFrame
+        group_copy = data.copy()
+        # Select only the columns with missing values
+        group_copy = group_copy.loc[:, group_copy.isna().sum() > 0]
+        # Split the data into training and test sets
+        train_data = group_copy.dropna()
+        test_data = group_copy.loc[group_copy.isna().any(axis=1)]
+        # Select the target column to impute
+        target_column = test_data.columns[0]
+        # Fit a linear regression model
+        model = LinearRegression()
+        model.fit(train_data.drop(columns=target_column), train_data[target_column])
+        # Predict the missing values
+        test_data[target_column] = model.predict(test_data.drop(columns=target_column))
+        # Combine the training and test sets
+        combined_data = pd.concat([train_data, test_data], axis=0)
+        # Merge the imputed data with the original group DataFrame
+        merged_data = pd.merge(data, combined_data, on=list(data.columns), how='outer')
+        return merged_data
+
+    # Impute missing values for each country group
+    data = impute_linear_regression(data)
+
     # Split data into training and test sets
     X = data.drop(['country', 'year', 'life_expectancy', 'male_life_expectancy','female_life_expectancy','development_status'], axis=1)
     y = data['life_expectancy']
@@ -317,30 +398,27 @@ def ml_model():
                     'obesity_prevalence', 'carbon_emissions', 'schooling', 'physicians', 'sanitation_mortality_rate',
                     'urban_population', 'rural_population', 'sanitation_population_perct', 'unemployment_perct',
                     'mobile_cell_subs', 'GINI_index']
-    
-    X_train[num_features] = scaler.fit_transform(X_train[num_features])
-    X_test[num_features] = scaler.transform(X_test[num_features])
-
     # Fit Random Forest Regressor model
     rf = RandomForestRegressor(n_estimators=100, random_state=42)
     rf.fit(X_train, y_train)
-
     st.title('Life Expectancy Prediction')
-    
         # Collect user input
-    healthcare_spending = st.number_input('Healthcare spending (as % of GDP)', min_value=0, max_value=100, value=10)
-    GDP_per_capita = st.number_input('GDP per capita (in US dollars)', min_value=0, max_value=100000, value=5000)
-    obesity_prevalence = st.number_input('Obesity prevalence (as % of population)', min_value=0, max_value=100, value=20)
-    carbon_emissions = st.number_input('Carbon emissions (in metric tons per capita)', min_value=0, max_value=30, value=5)
-    schooling = st.number_input('Schooling (in years)', min_value=0, max_value=30, value=10)
-    physicians = st.number_input('Number of physicians per 1000 population', min_value=0, max_value=10, value=2)
-    sanitation_mortality_rate = st.number_input('Sanitation mortality rate (per 1000 population)', min_value=0, max_value=10, value=2)
-    urban_population = st.number_input('Urban population (as % of total population)', min_value=0, max_value=100, value=50)
-    rural_population = st.number_input('Rural population (as % of total population)', min_value=0, max_value=100, value=50)
-    sanitation_population_perct = st.number_input('Sanitation population percent (as % of total population)', min_value=0, max_value=100, value=50)
-    unemployment_perct = st.number_input('Unemployment percent (as % of total labor force)', min_value=0, max_value=50, value=10)
-    mobile_cell_subs = st.number_input('Mobile cellular subscriptions (per 100 people)', min_value=0, max_value=200, value=50)
-    GINI_index = st.number_input('GINI index (measure of income inequality)', min_value=0, max_value=100, value=50)
+    ml_col1, ml_col2 = st.columns([1,1])
+    with ml_col1:
+        healthcare_spending = st.number_input('Healthcare spending (as % of GDP)', min_value=0, max_value=100, value=10)
+        GDP_per_capita = st.number_input('GDP per capita (in US dollars)', min_value=0, max_value=100000, value=5000)
+        obesity_prevalence = st.number_input('Obesity prevalence (as % of population)', min_value=0, max_value=100, value=20)
+        carbon_emissions = st.number_input('Carbon emissions (in metric tons per capita)', min_value=0, max_value=100, value=5)
+        schooling = st.number_input('Schooling (in years)', min_value=0, max_value=30, value=20)
+        physicians = st.number_input('Number of physicians per 1000 population', min_value=0, max_value=1000, value=2)
+        sanitation_mortality_rate = st.number_input('Sanitation mortality rate (per 1000 population)', min_value=0, max_value=1000, value=2)
+    with ml_col2:
+        urban_population = st.number_input('Urban population (as % of total population)', min_value=0, max_value=100, value=50)
+        rural_population = st.number_input('Rural population (as % of total population)', min_value=0, max_value=100, value=50)
+        sanitation_population_perct = st.number_input('Sanitation population percent (as % of total population)', min_value=0, max_value=100, value=50)
+        unemployment_perct = st.number_input('Unemployment percent (as % of total labor force)', min_value=0, max_value=100, value=10)
+        mobile_cell_subs = st.number_input('Mobile cellular subscriptions (per 100 people)', min_value=0, max_value=200, value=50)
+        GINI_index = st.number_input('GINI index (measure of income inequality)', min_value=0, max_value=100, value=50)
 
     submit_button = st.button('Submit')
     if submit_button:
@@ -361,18 +439,26 @@ def ml_model():
         'GINI_index': GINI_index
         }, index=[0])
 
-        # Scale numerical features using StandardScaler
-        input_data[num_features] = scaler.transform(input_data[num_features])
-
         # Make predictions
         prediction = rf.predict(input_data)[0]
 
         # Display prediction
         st.write('Predicted life expectancy:', round(prediction, 2))
 
+def schooling():
+    import plotly.express as px
+    s1, s2 = st.columns([2,1])
+    schooling_vs_life_expectancy = data[['country', 'year', 'schooling', 'life_expectancy']]
+    with s1:
+        fig = px.box(data_frame=data, x='development_status', y='schooling', color='development_status')
+        fig.update_layout(title='Distribution of Life Expectancy by Development Status', xaxis_title='Development Status', yaxis_title='Number of Years Spent in School')
+        st.plotly_chart(fig)
+    with s2:
+        cmx = px.imshow(data[['life_expectancy','schooling']].corr(),text_auto=True)
+        st.plotly_chart(cmx)
 
 # Set up navigation
-nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Covid-19 Affecting Life Expectancy","About Us","Component","ML Model"])
+nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Healthcare Expenditure and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","Component","ML Model"])
 
 # Show appropriate page based on selection
 if nav == "Home":
@@ -381,6 +467,8 @@ elif nav == "Relevant Features of Dataset":
     corr_matrix()
 elif nav == "ML Model":
     ml_model()
+elif nav == "Schooling and Life Expectancy":
+    schooling()
 elif nav == "About Us":
     about()
 elif nav == "Gender and Life Expectancy":
@@ -391,11 +479,8 @@ elif nav == "Sanitation and Life Expectancy":
     sanitation()
 elif nav == "Healthcare Expenditure and Life Expectancy":
     healthcare()
-elif nav == "Covid-19 Affecting Life Expectancy":
-    covid()
-elif nav == "Component":
-    component()
+elif nav == "Obesity Prevalence and Life Expectancy":
+    obesity_prevalence()
 else:
     pass
 
-st.sidebar.image("web.png", use_column_width=True)

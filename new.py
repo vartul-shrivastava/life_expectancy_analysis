@@ -1,4 +1,3 @@
-
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -61,4 +60,3 @@ data['development_status'] = data.apply(classify_country, axis=1)
 data['year'] = data['year'].astype('int')
 
 data.to_csv('backup.csv')
-
