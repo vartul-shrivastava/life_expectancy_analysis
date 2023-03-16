@@ -516,4 +516,3 @@ elif nav == "Obesity Prevalence and Life Expectancy":
 else:
     pass
 st.sidebar.image("web.png", use_column_width=True)
-
