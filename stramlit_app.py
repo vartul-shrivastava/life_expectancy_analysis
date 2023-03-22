@@ -31,7 +31,6 @@ footer {visibility: hidden}
 """
 st.markdown(hide, unsafe_allow_html=True)
 
-st.sidebar.image("iiitv.png", use_column_width=True)
 
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
@@ -500,4 +499,3 @@ elif nav == "Obesity Prevalence and Life Expectancy":
     obesity_prevalence()
 else:
     pass
-st.sidebar.image("web.png", use_column_width=True)
