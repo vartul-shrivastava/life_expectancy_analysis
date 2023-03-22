@@ -64,7 +64,7 @@ def about():
     st.markdown("""
         This project is a web application that allows users to select various life expectancy graphs using Plotly from a dropdown. 
         The graphs display life expectancy data for different countries over time. The application was built using the Streamlit library 
-        for Python and deployed using Heroku.
+        for Python.
     """)
     
     st.write("")
