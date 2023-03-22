@@ -33,10 +33,6 @@ st.markdown(hide, unsafe_allow_html=True)
 
 st.sidebar.image("iiitv.png", use_column_width=True)
 
-
-
-# Add your Streamlit app code here
-
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
     st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
@@ -62,20 +58,10 @@ def homepage():
     
     st.write("We hope that this project will help you gain a better understanding of the factors that contribute to life expectancy around the world.")
 
-
 def about():
     st.title("About Us")
     
-    st.markdown("This project was created by the following team members from Indian Institute of Information Technology Vadodara - International Campus Diu:")
-    
-    st.markdown("""
-    #### Team Members
-    - Vartul Shrivastava
-    - Yashesh Bhavsar
-    - Perin Mangukiya
-    - Prafulla Patil
-    - Suyash Rajput
-    """)
+    st.markdown("This project is created by Vartul Shrivastava")
     st.markdown("""
         This project is a web application that allows users to select various life expectancy graphs using Plotly from a dropdown. 
         The graphs display life expectancy data for different countries over time. The application was built using the Streamlit library 
@@ -83,7 +69,6 @@ def about():
     """)
     
     st.write("")
-
 
 def gender():
 
@@ -159,7 +144,6 @@ def gender():
 
         In low-income countries, the difference between male and female life expectancy is generally the largest, with females having significantly higher life expectancies compared to males. This can be attributed to a range of factors including limited access to healthcare facilities, higher rates of poverty and malnutrition, limited access to education and information, and gender inequalities that affect women's health outcomes.
         """)
-
 
 def sanitation():
     st.title("Sanitation and Life Expectancy")
@@ -292,8 +276,7 @@ def carbon_emissions():
 
     h1 = px.scatter(data, x='year',marginal_y= 'box' ,y='GDP_per_capita',log_y=True ,color='development_status',template='plotly_dark', hover_data=['country'], width=1100)
     st.plotly_chart(h1,use_container_width=True)
-
-    
+   
 def obesity_prevalence():
         st.title('Obesity Prevalence and Life Expectancy')
         o1, o0, o2 = st.columns([1.2,0.1,1])
@@ -481,15 +464,17 @@ def ml_model():
 
 def schooling():
     import plotly.express as px
+    st.title("Schooling in Countries and Life Expectancy")
+    st.markdown('The schooling in primary, secondary and higher level education on average shows a good moderately-positive relation of +0.72. Hence, the number of years an individual on average spents in gaining education, helps him to achieve the certain upksilled lifestyle which enables for a sustainable life ahead.')
     s1, s2 = st.columns([2,1])
-    schooling_vs_life_expectancy = data[['country', 'year', 'schooling', 'life_expectancy']]
     with s1:
-        fig = px.box(data_frame=data, x='development_status', y='schooling', color='development_status')
+        fig = px.bar(data_frame=data, x='development_status', y='schooling', color='development_status')
         fig.update_layout(title='Distribution of Life Expectancy by Development Status', xaxis_title='Development Status', yaxis_title='Number of Years Spent in School')
         st.plotly_chart(fig)
     with s2:
         cmx = px.imshow(data[['life_expectancy','schooling']].corr(),text_auto=True)
         st.plotly_chart(cmx)
+    st.markdown('Here is the cumulative summation of years on y-axis and development status of each country on x-axis. We can clearly see the similar trend of education for ')
 
 # Set up navigation
 nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","ML Model"])
