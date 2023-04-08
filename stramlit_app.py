@@ -22,7 +22,6 @@ import plotly.express as px
 
 data = pd.read_csv('backup.csv')
 
-
 st.set_page_config(page_title="CS312 | Life Expectancy Analysis on World Bank Parameters", page_icon="./fav.png", layout="wide", initial_sidebar_state="expanded")
 hide = """
 <style>
@@ -56,6 +55,7 @@ def homepage():
     st.write("To get started, choose a parameter from the sidebar on the left and select a country or region from the dropdown menu.")
     
     st.write("We hope that this project will help you gain a better understanding of the factors that contribute to life expectancy around the world.")
+
 
 def about():
     st.title("About Us")
@@ -146,6 +146,11 @@ def gender():
 
 def sanitation():
     st.title("Sanitation and Life Expectancy")
+    cmx = px.imshow(data[['life_expectancy','sanitation_mortality_rate','physicians']].corr(),text_auto=True, width=400)
+
+    cmx.update_layout(coloraxis_colorbar=dict(x=.4, y=1.2, len=0.8, yanchor='top', orientation='h'))
+    st.plotly_chart(cmx)
+
     # Define the ranges for sanitation mortality rate and life expectancy
     sanitation_bins = [-1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
     life_expectancy_bins = [0, 50, 60, 70, 80, 90, 100]
@@ -202,6 +207,35 @@ def sanitation():
                              titlefont=dict(family='Arial', size=16),
                              tickfont=dict(family='Arial', size=14)))
     st.plotly_chart(s2)
+
+    tempDF = data.dropna(subset=['physicians'])
+    fig = px.scatter(tempDF,template='plotly_dark', x='healthcare_spending', y='life_expectancy',
+                    color='development_status', hover_name='country', size='physicians',
+                    log_x=True, title="Analyzing <b>Healthcare Spending</b> and Life Expectancy")
+    fig.update_yaxes(range=[35, 90])
+    st.plotly_chart(fig)
+
+    from plotly.subplots import make_subplots
+    # Calculate average number of physicians and life expectancy by development status
+    physicians_and_life_exp_by_status = data.groupby('development_status').agg({'physicians': 'mean', 'life_expectancy': 'mean'}).reset_index()
+    physicians_and_life_exp_by_status = physicians_and_life_exp_by_status.sort_values(by='physicians')
+
+    # Create subplot figure with two vertical subplots
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # Add bar traces for physicians and life expectancy
+    fig.add_trace(go.Bar(x=physicians_and_life_exp_by_status['development_status'], y=physicians_and_life_exp_by_status['physicians'],
+                        name='Number of Physicians'), secondary_y=False)
+    fig.add_trace(go.Line(x=physicians_and_life_exp_by_status['development_status'], y=physicians_and_life_exp_by_status['life_expectancy'],
+                        name='Life Expectancy'), secondary_y=True)
+
+    # Update layout and axis titles
+    fig.update_layout(title='Average Number of Physicians and Life Expectancy by Development Status', 
+                    xaxis_title='Development Status', yaxis_title='Number of Physicians',template='plotly_dark'  ,
+                    yaxis2_title='Life Expectancy')
+
+    # Show the plot
+    st.plotly_chart(fig)
 
 def carbon_emissions():
     st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
@@ -374,92 +408,79 @@ def corr_matrix():
     """)
 
 def ml_model():
-    data = pd.read_csv('backup.csv')
-    # Clean data by filling missing values with mean
-    # Define function to impute missing values using linear regression
-    def impute_linear_regression(data):
-        # Create a copy of the group DataFrame
-        group_copy = data.copy()
-        # Select only the columns with missing values
-        group_copy = group_copy.loc[:, group_copy.isna().sum() > 0]
-        # Split the data into training and test sets
-        train_data = group_copy.dropna()
-        test_data = group_copy.loc[group_copy.isna().any(axis=1)]
-        # Select the target column to impute
-        target_column = test_data.columns[0]
-        # Fit a linear regression model
-        model = LinearRegression()
-        model.fit(train_data.drop(columns=target_column), train_data[target_column])
-        # Predict the missing values
-        test_data[target_column] = model.predict(test_data.drop(columns=target_column))
-        # Combine the training and test sets
-        combined_data = pd.concat([train_data, test_data], axis=0)
-        # Merge the imputed data with the original group DataFrame
-        merged_data = pd.merge(data, combined_data, on=list(data.columns), how='outer')
-        return merged_data
+    import streamlit as st
+    import pandas as pd
+    import pickle
+    import numpy as np
 
-    # Impute missing values for each country group
-    data = impute_linear_regression(data)
+    # Load the saved model
+    import pandas as pd
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import mean_squared_error, r2_score
+
+    # Load the data
+    data = pd.read_csv('backup.csv')
+
+    # Remove NaN values
+    data = data.dropna()
+
+    # Remove development status
+    data = data.drop('development_status', axis=1)
+
+    # Define features and target
+    features = ['healthcare_spending', 'GDP_per_capita', 'obesity_prevalence', 'carbon_emissions', 'schooling', 'physicians', 'sanitation_mortality_rate', 'urban_population', 'rural_population', 'sanitation_population_perct', 'unemployment_perct', 'mobile_cell_subs', 'GINI_index']
+    target = 'life_expectancy'
 
     # Split data into training and test sets
-    X = data.drop(['country', 'year', 'life_expectancy', 'male_life_expectancy','female_life_expectancy','development_status'], axis=1)
-    y = data['life_expectancy']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    X_train = X_train.drop('Unnamed: 0', axis=1)
-    X_test = X_test.drop('Unnamed: 0', axis=1)
-    # Scale numerical features using StandardScaler
-    scaler = StandardScaler()
-    num_features = ['healthcare_spending',          
-                    'GDP_per_capita',
-                    'obesity_prevalence', 'carbon_emissions', 'schooling', 'physicians', 'sanitation_mortality_rate',
-                    'urban_population', 'rural_population', 'sanitation_population_perct', 'unemployment_perct',
-                    'mobile_cell_subs', 'GINI_index']
-    # Fit Random Forest Regressor model
+    X_train, X_test, y_train, y_test = train_test_split(data[features], data[target], test_size=0.25, random_state=42)
+
+    # Train the model
     rf = RandomForestRegressor(n_estimators=100, random_state=42)
     rf.fit(X_train, y_train)
-    st.title('Life Expectancy Prediction')
-        # Collect user input
-    ml_col1, ml_col2 = st.columns([1,1])
-    with ml_col1:
-        healthcare_spending = st.number_input('Healthcare spending (as % of GDP)', min_value=0, max_value=100, value=10)
-        GDP_per_capita = st.number_input('GDP per capita (in US dollars)', min_value=0, max_value=100000, value=5000)
-        obesity_prevalence = st.number_input('Obesity prevalence (as % of population)', min_value=0, max_value=100, value=20)
-        carbon_emissions = st.number_input('Carbon emissions (in metric tons per capita)', min_value=0, max_value=100, value=5)
-        schooling = st.number_input('Schooling (in years)', min_value=0, max_value=30, value=20)
-        physicians = st.number_input('Number of physicians per 1000 population', min_value=0, max_value=1000, value=2)
-        sanitation_mortality_rate = st.number_input('Sanitation mortality rate (per 1000 population)', min_value=0, max_value=1000, value=2)
-    with ml_col2:
-        urban_population = st.number_input('Urban population (as % of total population)', min_value=0, max_value=100, value=50)
-        rural_population = st.number_input('Rural population (as % of total population)', min_value=0, max_value=100, value=50)
-        sanitation_population_perct = st.number_input('Sanitation population percent (as % of total population)', min_value=0, max_value=100, value=50)
-        unemployment_perct = st.number_input('Unemployment percent (as % of total labor force)', min_value=0, max_value=100, value=10)
-        mobile_cell_subs = st.number_input('Mobile cellular subscriptions (per 100 people)', min_value=0, max_value=200, value=50)
-        GINI_index = st.number_input('GINI index (measure of income inequality)', min_value=0, max_value=100, value=50)
 
-    submit_button = st.button('Submit')
-    if submit_button:
-        # Create input DataFrame from user input    
-        input_data = pd.DataFrame({
-        'healthcare_spending': healthcare_spending,
-        'GDP_per_capita': GDP_per_capita,
-        'obesity_prevalence': obesity_prevalence,
-        'carbon_emissions': carbon_emissions,
-        'schooling': schooling,
-        'physicians': physicians,
-        'sanitation_mortality_rate': sanitation_mortality_rate,
-        'urban_population': urban_population,
-        'rural_population': rural_population,
-        'sanitation_population_perct': sanitation_population_perct,
-        'unemployment_perct': unemployment_perct,
-        'mobile_cell_subs': mobile_cell_subs,
-        'GINI_index': GINI_index
-        }, index=[0])
+    # Define the input features and their default values
+    input_features = ['healthcare_spending', 'GDP_per_capita', 'obesity_prevalence', 
+                    'carbon_emissions', 'schooling', 'physicians', 'sanitation_mortality_rate',
+                    'urban_population', 'rural_population', 'sanitation_population_perct', 
+                    'unemployment_perct', 'mobile_cell_subs', 'GINI_index']
 
-        # Make predictions
-        prediction = rf.predict(input_data)[0]
+    default_values = {'healthcare_spending': 2000, 'GDP_per_capita': 1000, 
+                    'obesity_prevalence': 10, 'carbon_emissions': 1, 'schooling': 50, 
+                    'physicians': 1, 'sanitation_mortality_rate': 0.5, 'urban_population': 50, 
+                    'rural_population': 50, 'sanitation_population_perct': 50, 'unemployment_perct': 5, 
+                    'mobile_cell_subs': 50, 'GINI_index': 40}
 
-        # Display prediction
-        st.write('Predicted life expectancy:', round(prediction, 2))
+    # Define a function to get the user inputs
+    def get_input_values():
+        input_values = {}
+        for feature in input_features:
+            value = st.number_input(label=feature, value=default_values[feature])
+            input_values[feature] = value
+        return input_values
+
+# Define a function to preprocess the input data
+    def preprocess_data(input_values):
+        data = pd.DataFrame([input_values])
+        data = data[['healthcare_spending', 'GDP_per_capita', 'obesity_prevalence', 
+                    'carbon_emissions', 'schooling', 'physicians', 'sanitation_mortality_rate',
+                    'urban_population', 'rural_population', 'sanitation_population_perct', 
+                    'unemployment_perct', 'mobile_cell_subs', 'GINI_index']]
+        return data
+
+
+    # Set page header
+    st.write('# Life Expectancy Prediction ML App')
+    st.write('The model developed predicts life expectancy based on various indicators such as healthcare spending, GDP per capita, and obesity prevalence. It uses advanced machine learning techniques to make accurate predictions while handling missing data and excluding development status. The model has a high R² score of 0.94, which means that it can explain 94% of the variance in the target variable, making it a very good result for a regression model. This means that the model can accurately predict life expectancy for different countries based on their socio-economic and healthcare indicators..')
+    # Get the input values from the user
+    input_values = get_input_values()
+    if st.button("Predict Life Expectancy"):
+        
+        # Preprocess the input data
+        data = preprocess_data(input_values)
+        prediction = rf.predict(data)
+        st.write('## Predicted Life Expectancy')
+        st.write(f'{np.round(prediction[0], 1)} years')
 
 def schooling():
     import plotly.express as px
@@ -467,13 +488,28 @@ def schooling():
     st.markdown('The schooling in primary, secondary and higher level education on average shows a good moderately-positive relation of +0.72. Hence, the number of years an individual on average spents in gaining education, helps him to achieve the certain upksilled lifestyle which enables for a sustainable life ahead.')
     s1, s2 = st.columns([2,1])
     with s1:
-        fig = px.bar(data_frame=data, x='development_status', y='schooling', color='development_status')
-        fig.update_layout(title='Distribution of Life Expectancy by Development Status', xaxis_title='Development Status', yaxis_title='Number of Years Spent in School')
+        avg_schooling = data.groupby('development_status')['schooling'].agg(np.mean).reset_index()
+
+        fig = px.bar(avg_schooling, x="development_status", y="schooling", color="development_status")
+        fig.update_layout(title="Average Years of Schooling by Development Status",
+                        xaxis_title="Development Status",
+                        yaxis_title="Years of Schooling")
         st.plotly_chart(fig)
     with s2:
         cmx = px.imshow(data[['life_expectancy','schooling']].corr(),text_auto=True)
         st.plotly_chart(cmx)
     st.markdown('Here is the cumulative summation of years on y-axis and development status of each country on x-axis. We can clearly see the similar trend of education for ')
+    fig = px.scatter(data, x='schooling', y='life_expectancy', color='development_status', width=1000, log_x=True,
+                 hover_data=['country', 'year', 'healthcare_spending', 'obesity_prevalence'],
+                 title='Relationship between Schooling and Life Expectancy by Income Group')
+    st.plotly_chart(fig)
+    st.markdown('''
+    The graph is a scatter plot that shows the relationship between schooling and life expectancy, with each dot representing a country. The x-axis represents the average number of years of schooling, while the y-axis represents the life expectancy at birth in years. The color of the dots indicates the development status of the country, with developed countries in blue, developing countries in orange, lower-middle-income countries in green, and low-income countries in red.
+
+    The graph suggests a strong positive correlation between schooling and life expectancy, with countries that have higher levels of schooling also having higher life expectancies. Additionally, the graph shows that developed countries generally have higher levels of schooling and life expectancy than developing countries and lower-income countries.
+
+    The hover data on the graph provides additional information about each country, including healthcare spending and obesity prevalence, which may be useful in further analyzing the relationship between schooling and life expectancy.
+    ''')
 
 # Set up navigation
 nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","ML Model"])
