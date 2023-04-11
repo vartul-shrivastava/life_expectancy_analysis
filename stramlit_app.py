@@ -513,7 +513,7 @@ def schooling():
 
 # Set up navigation
 nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","ML Model"])
-
+st.sidebar.image("developed.png", use_column_width=True)
 # Show appropriate page based on selection
 if nav == "Home":
     homepage()
