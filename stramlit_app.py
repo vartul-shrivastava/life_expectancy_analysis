@@ -358,6 +358,7 @@ def corr_matrix():
     st.title('Representing Correlations between the dataset')
     corr1 = px.imshow(data.corr(),color_continuous_scale=px.colors.sequential.Viridis,text_auto=True, title='HeatMap : To show correlation in between the <b>relevant features</b>')
     corr1.update_layout(height = 800,width = 1200,)
+    st.dataframe(data,use_container_width=True)
     st.markdown("""
     Upon analyzing the correlation matrix, it is evident that healthcare spending exhibits a strong positive correlation (0.64) with life expectancy. Additionally, GDP per capita (0.54) and carbon emissions (0.53) exhibit considerable correlation with life expectancy. These correlations will be further explored and visualized in the graphs to gain more insights.
 
