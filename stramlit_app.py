@@ -30,7 +30,6 @@ footer {visibility: hidden}
 """
 st.markdown(hide, unsafe_allow_html=True)
 
-
 def homepage():
     st.title("Life Expectancy Analysis on World Bank Parameters")
     st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
@@ -143,6 +142,26 @@ def gender():
 
         In low-income countries, the difference between male and female life expectancy is generally the largest, with females having significantly higher life expectancies compared to males. This can be attributed to a range of factors including limited access to healthcare facilities, higher rates of poverty and malnutrition, limited access to education and information, and gender inequalities that affect women's health outcomes.
         """)
+
+    # Load the data from a CSV file
+    data_gini = pd.read_csv(r".\World in Data CSVs\gini.csv")
+
+    # Create a list of countries to display in the chart
+    countries = ['USA', 'DEU', 'SWE']
+
+    # Filter the data to only include the selected countries
+    filtered_data = data_gini[data_gini['Code'].isin(countries)]
+
+    # Create a line chart using Plotly Express
+    chart = px.line(filtered_data, x='Year', y='Gini coefficients for lifetime inequality (Peltzman (2009))', color='Country')
+
+    # Set the chart title and axis labels
+    chart.update_layout(title='GINI Index Comparison of Germany, Sweden and USA', xaxis_title='Year', yaxis_title='Gini Index')
+
+    # Display the chart in Streamlit
+    st.plotly_chart(chart,use_container_width=True)
+
+    st.markdown("The inequality in years of life between people within the same country can be measured in the same way that we measure, for example, the inequality in the distribution of incomes. The idea is to estimate the extent to which a small share of a country’s population concentrates a large ‘stock of health’, hence living much longer than most of the population in the same country. The following visualization presents estimates of the inequality of lifetimes as measured by the Gini coefficient. A high Gini coefficient here means a very unequal distribution of years of life – that is, large within-country inequalities of the number of years that people live.")
 
 def sanitation():
     st.title("Sanitation and Life Expectancy")
@@ -356,9 +375,9 @@ def obesity_prevalence():
 
 def corr_matrix():
     st.title('Representing Correlations between the dataset')
-    corr1 = px.imshow(data.corr(),color_continuous_scale=px.colors.sequential.Viridis,text_auto=True, title='HeatMap : To show correlation in between the <b>relevant features</b>')
+    data_corr = data.drop(columns=['year', 'Unnamed: 0'])
+    corr1 = px.imshow(data_corr.corr(),color_continuous_scale=px.colors.sequential.Viridis,text_auto=True, title='HeatMap : To show correlation in between the <b>relevant features</b>')
     corr1.update_layout(height = 800,width = 1200,)
-    st.dataframe(data,use_container_width=True)
     st.markdown("""
     Upon analyzing the correlation matrix, it is evident that healthcare spending exhibits a strong positive correlation (0.64) with life expectancy. Additionally, GDP per capita (0.54) and carbon emissions (0.53) exhibit considerable correlation with life expectancy. These correlations will be further explored and visualized in the graphs to gain more insights.
 
