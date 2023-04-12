@@ -165,11 +165,18 @@ def gender():
 
 def sanitation():
     st.title("Sanitation and Life Expectancy")
+    col1, col2 = st.columns([1, 3])
+    st.markdown("""
+    Sanitation and life expectancy are two critical factors that affect the health of individuals and populations. The provision of adequate sanitation facilities can help prevent the spread of infectious diseases, which can have a significant impact on life expectancy.
+    """)
     cmx = px.imshow(data[['life_expectancy','sanitation_mortality_rate','physicians']].corr(),text_auto=True, width=400)
 
     cmx.update_layout(coloraxis_colorbar=dict(x=.4, y=1.2, len=0.8, yanchor='top', orientation='h'))
-    st.plotly_chart(cmx)
+    st.plotly_chart(cmx, use_container_width=True)
+    st.markdown('''
+    This can be seen in the Sanitation and Life Expectancy plot, which visualizes the correlation between sanitation mortality rate, life expectancy, and physicians. The plot shows that countries with higher sanitation mortality rates tend to have lower life expectancies, highlighting the importance of access to clean water and adequate sanitation facilities.
 
+    ''')
     # Define the ranges for sanitation mortality rate and life expectancy
     sanitation_bins = [-1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
     life_expectancy_bins = [0, 50, 60, 70, 80, 90, 100]
@@ -202,7 +209,10 @@ def sanitation():
     # Add labels to the nodes
     s1.update_layout(title='<b>Sankey Diagram</b> of Sanitation Mortality Rate <i>(left)</i> vs Life Expectancy <i>(right)</i>',    xaxis_title = "X-Axis Label",
     yaxis_title = "Y-Axis Label")
-    st.plotly_chart(s1)
+    st.plotly_chart(s1,use_container_width=True)
+    st.markdown('''
+    The Sankey diagram in the plot also demonstrates the relationship between sanitation mortality rate and life expectancy by grouping countries into bins based on their sanitation mortality rate and life expectancy. The diagram illustrates the flow of countries from one bin to another based on their sanitation mortality rate and life expectancy, providing a visual representation of the relationship between these factors.
+    ''')
 
     s2 = px.scatter(data, x='life_expectancy', y='sanitation_mortality_rate', 
                  color='development_status',
@@ -225,15 +235,16 @@ def sanitation():
                   yaxis=dict(title='Sanitation Mortality Rate',
                              titlefont=dict(family='Arial', size=16),
                              tickfont=dict(family='Arial', size=14)))
-    st.plotly_chart(s2)
+    st.plotly_chart(s2,use_container_width=True)
 
     tempDF = data.dropna(subset=['physicians'])
     fig = px.scatter(tempDF,template='plotly_dark', x='healthcare_spending', y='life_expectancy',
                     color='development_status', hover_name='country', size='physicians',
                     log_x=True, title="Analyzing <b>Healthcare Spending</b> and Life Expectancy")
     fig.update_yaxes(range=[35, 90])
-    st.plotly_chart(fig)
-
+    st.plotly_chart(fig,use_container_width=True)
+    st.markdown('''Furthermore, the scatter plot in the Sanitation and Life Expectancy plot shows that life expectancy tends to increase as sanitation mortality rates decrease, and this trend holds across different levels of development status. This reinforces the importance of sanitation facilities in promoting better health outcomes and improving life expectancy.
+    ''')
     from plotly.subplots import make_subplots
     # Calculate average number of physicians and life expectancy by development status
     physicians_and_life_exp_by_status = data.groupby('development_status').agg({'physicians': 'mean', 'life_expectancy': 'mean'}).reset_index()
@@ -254,7 +265,10 @@ def sanitation():
                     yaxis2_title='Life Expectancy')
 
     # Show the plot
-    st.plotly_chart(fig)
+    st.plotly_chart(fig,use_container_width=True)
+    st.markdown('''
+    In conclusion, the Sanitation and Life Expectancy plot emphasizes the critical role that sanitation plays in promoting better health outcomes and improving life expectancy. The plot demonstrates that access to clean water and sanitation facilities is essential for maintaining good health and wellbeing, and highlights the need for continued efforts to improve sanitation infrastructure globally.
+    ''')
 
 def carbon_emissions():
     st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
@@ -372,6 +386,7 @@ def obesity_prevalence():
         st.markdown("""
                In terms of differences between development status categories, we can see that obesity prevalence is generally highest in developed countries, followed by developing, lower middle income, and low-income countries, in that order. This trend is consistent across all years in the dataset. The density plots show that obesity prevalence in developed countries is more spread out and has a higher peak compared to other development status categories, indicating that there are more people in developed countries who are severely obese.
         """)
+
 
 def corr_matrix():
     st.title('Representing Correlations between the dataset')
