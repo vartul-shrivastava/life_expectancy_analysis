@@ -610,7 +610,7 @@ def ml_model():
 
     # Set page header
     st.write('# Longevity Potential Prediction ML App')
-    st.write('The model developed predicts Longevity Potential based on various indicators such as healthcare spending, GDP per capita, and obesity prevalence. It uses advanced machine learning techniques to make accurate predictions while handling missing data and excluding development status. The model has a high R² score of 0.94, which means that it can explain 94% of the variance in the target variable, making it a very good result for a regression model. This means that the model can accurately predict Longevity Potential for different countries based on their socio-economic and healthcare indicators..')
+    st.write('The model developed predicts Longevity Potential based on various indicators such as healthcare spending, GDP per capita, and obesity prevalence. It uses advanced machine learning techniques to make accurate predictions while handling missing data and excluding development status. The model has a high R² score of 0.87, which means that it can explain 87% of the variance in the target variable, making it a very good result for a regression model. This means that the model can accurately predict Longevity Potential for different countries based on their socio-economic and healthcare indicators..')
     # Get the input values from the user
     input_values = get_input_values()
     if st.button("Predict Longevity Potential"):
