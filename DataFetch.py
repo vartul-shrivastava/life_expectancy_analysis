@@ -1,8 +1,4 @@
-warnings.filterwarnings("ignore", category = FutureWarning)
-warnings.filterwarnings("ignore", category = DeprecationWarning)
-import plotly.express as px
 import wbdata
-
 indicators = {'SP.DYN.LE00.IN': 'life_expectancy',
               'SP.DYN.LE00.MA.IN' : 'male_life_expectancy',
               'SP.DYN.LE00.FE.IN' : 'female_life_expectancy',

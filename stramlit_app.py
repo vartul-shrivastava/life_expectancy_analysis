@@ -130,7 +130,7 @@ def gender():
 
     # In the second column, display the Plotly graph
     with col2:
-        fig = px.line(filtered_data, x='year', y='life_expectancy', color='country', title='Longevity Potential Comparison')
+        fig = px.line(filtered_data, x='year', y='life_expectancy', color='country', title='Longevity Potential Comparison (Life Expectancy in Years)')
         st.plotly_chart(fig,use_container_width=True)
 
     #graph 1
@@ -138,7 +138,7 @@ def gender():
     kol1, kol2 = st.columns([1, 2])
     with kol2:
         grouped_data = data.groupby(['country', 'year']).mean().reset_index()
-        d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Longevity Potential Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
+        d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Longevity Potential Comparison (Male vs Female) | Both axes are years in unit', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
         d1.update_layout(
             legend=dict(
             orientation='h',
@@ -175,7 +175,7 @@ def gender():
 
     # Plot the data
     fig = px.box(life_expectancy, height=600, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
-    fig.update_layout(title=f'Comparison of Male and Female Longevity Potential by Development Status ({year})', xaxis_title='Longevity Potential', yaxis_title='Development Status')
+    fig.update_layout(title=f'Comparison of Male and Female Longevity Potential by Development Status ({year})', xaxis_title='Longevity Potential(Years)', yaxis_title='Development Status')
     st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("""
@@ -202,7 +202,7 @@ def gender():
     chart = px.line(filtered_data, x='Year', y='Gini coefficients for lifetime inequality (Peltzman (2009))', color='Country')
 
     # Set the chart title and axis labels
-    chart.update_layout(title='GINI Index Comparison of Germany, Sweden and USA', xaxis_title='Year', yaxis_title='Gini Index')
+    chart.update_layout(title='GINI Index Comparison of Germany, Sweden and USA', xaxis_title='Year', yaxis_title='Gini Index(0-1)')
 
     # Display the chart in Streamlit
     st.plotly_chart(chart,use_container_width=True)
@@ -226,7 +226,6 @@ def sanitation():
     # Define the ranges for sanitation mortality rate and Longevity Potential
     sanitation_bins = [-1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
     life_expectancy_bins = [0, 50, 60, 70, 80, 90, 100]
-
     # Bin the data
     data['sanitation_bin'] = pd.cut(data['sanitation_mortality_rate'], sanitation_bins, labels=False)
     data['life_expectancy_bin'] = pd.cut(data['life_expectancy'], life_expectancy_bins, labels=False)
@@ -253,7 +252,7 @@ def sanitation():
     ))])
 
     # Add labels to the nodes
-    s1.update_layout(title='<b>Sankey Diagram</b> of Sanitation Mortality Rate <i>(left)</i> vs Longevity Potential <i>(right)</i>',    xaxis_title = "X-Axis Label",
+    s1.update_layout(title='<b>Sankey Diagram</b> of Sanitation Mortality Rate (Per 1000 population) <i>(left)</i> vs Longevity Potential (Years) <i>(right)</i>',    xaxis_title = "X-Axis Label",
     yaxis_title = "Y-Axis Label")
     st.plotly_chart(s1,use_container_width=True)
     st.markdown('''
@@ -286,7 +285,7 @@ def sanitation():
     tempDF = data.dropna(subset=['physicians'])
     fig = px.scatter(tempDF,template='plotly_dark', x='healthcare_spending', y='life_expectancy',
                     color='development_status', hover_name='country', size='physicians',
-                    log_x=True, title="Analyzing <b>Healthcare Spending</b> and Longevity Potential")
+                    log_x=True, title="Analyzing <b>Healthcare Spending</b>($USD) and Longevity Potential(Years)")
     fig.update_yaxes(range=[35, 90])
     st.plotly_chart(fig,use_container_width=True)
     st.markdown('''Furthermore, the scatter plot in the Sanitation and Longevity Potential plot shows that Longevity Potential tends to increase as sanitation mortality rates decrease, and this trend holds across different levels of development status. This reinforces the importance of sanitation facilities in promoting better health outcomes and improving Longevity Potential.
@@ -303,7 +302,7 @@ def sanitation():
     fig.add_trace(go.Bar(x=physicians_and_life_exp_by_status['development_status'], y=physicians_and_life_exp_by_status['physicians'],
                         name='Number of Physicians'), secondary_y=False)
     fig.add_trace(go.Line(x=physicians_and_life_exp_by_status['development_status'], y=physicians_and_life_exp_by_status['life_expectancy'],
-                        name='Longevity Potential'), secondary_y=True)
+                        name='Longevity Potential(Years)'), secondary_y=True)
 
     # Update layout and axis titles
     fig.update_layout(title='Average Number of Physicians and Longevity Potential by Development Status', 
