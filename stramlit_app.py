@@ -72,7 +72,6 @@ def homepage():
     st.write("To get started, choose a parameter from the sidebar on the left and select a country or region from the dropdown menu.")
     st.write("We hope that this project will help you gain a better understanding of the factors that contribute to Longevity Potential around the world.")
 
-
 def about():
     st.title("About Us")
     
@@ -460,9 +459,6 @@ def obesity_prevalence():
         st.markdown("""
                In terms of differences between development status categories, we can see that obesity prevalence is generally highest in developed countries, followed by developing, lower middle income, and low-income countries, in that order. This trend is consistent across all years in the dataset. The density plots show that obesity prevalence in developed countries is more spread out and has a higher peak compared to other development status categories, indicating that there are more people in developed countries who are severely obese.
         """)
-
-
-
 
 def corr_matrix():
     st.title('Representing Correlations between the dataset')
