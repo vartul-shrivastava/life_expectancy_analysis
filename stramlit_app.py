@@ -20,49 +20,74 @@ warnings.filterwarnings("ignore", category = FutureWarning)
 warnings.filterwarnings("ignore", category = DeprecationWarning)
 import plotly.express as px
 
+# Read data from 'backup.csv' and store it in a Pandas DataFrame
 data = pd.read_csv('backup.csv')
 
-st.set_page_config(page_title="CS312 | Life Expectancy Analysis on World Bank Parameters", page_icon="./fav.png", layout="wide", initial_sidebar_state="expanded")
-hide = """
+# Set Streamlit page configuration settings
+st.set_page_config(
+    page_title="CS312 | Longevity Potential Analysis on World Bank Parameters",
+    page_icon="./fav.png",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Define CSS to hide the footer element
+hide_footer_css = """
 <style>
-footer {visibility: hidden}
+footer {
+    visibility: hidden;
+}
 </style>
 """
-st.markdown(hide, unsafe_allow_html=True)
 
+# Render the CSS using Streamlit's markdown function
+st.markdown(hide_footer_css, unsafe_allow_html=True)
+
+# Define function to display homepage
 def homepage():
-    st.title("Life Expectancy Analysis on World Bank Parameters")
-    st.write("Welcome to the Life Expectancy Analysis webpage!.This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
+    # Add title and description
+    st.title("Longevity Potential Analysis on World Bank Parameters")
+    st.write("Welcome to the Longevity Potential Analysis webpage! This project aims to analyze the Longevity Potential of countries around the world based on various World Bank parameters.")
+
+    # Create choropleth map
     fig = px.choropleth(data_frame=data,
                         animation_frame='year',
-                    locations='country',height=700,   
-                    locationmode='country names', 
-                    color='life_expectancy', 
-                    range_color=[20, 90]
-   )
-    #Add some additional layout options
-    fig.update_layout(geo=dict(showframe=False,       
-                            showcoastlines=False,
-                            bgcolor='rgba(0,0,0,0)',
-                            projection_type='equirectangular'))
-    
-    # Show the figure
-    st.plotly_chart(fig,use_container_width=True, height=600)
-    st.write("This project aims to analyze the life expectancy of countries around the world based on various World Bank parameters.")
-    st.write("Using data from the World Bank, we have created interactive graphs that allow you to explore the relationship between life expectancy and other factors such as GDP, healthcare spending, and education.")
-    
+                        locations='country',
+                        height=700,
+                        locationmode='country names',
+                        color='life_expectancy',
+                        range_color=[20, 90])
+
+    # Customize layout
+    fig.update_layout(geo=dict(showframe=False,
+                               showcoastlines=False,
+                               bgcolor='rgba(0,0,0,0)',
+                               projection_type='equirectangular'))
+
+    # Display figure
+    st.plotly_chart(fig, use_container_width=True, height=600)
+
+    # Add additional description
+    st.write("Using data from the World Bank, we have created interactive graphs that allow you to explore the relationship between Longevity Potential and other factors such as GDP, healthcare spending, and education.")
     st.write("To get started, choose a parameter from the sidebar on the left and select a country or region from the dropdown menu.")
-    
-    st.write("We hope that this project will help you gain a better understanding of the factors that contribute to life expectancy around the world.")
+    st.write("We hope that this project will help you gain a better understanding of the factors that contribute to Longevity Potential around the world.")
 
 
 def about():
     st.title("About Us")
     
-    st.markdown("This project is created by Vartul Shrivastava")
+    st.markdown("This project is created by group of students at IIITV-ICD")
+    st.markdown('''
+    1. Vartul Shrivastava
+    2. Perin Mangukiya
+    3. Prafulla Patil
+    4. Suyash Rajput
+    5. Yashesh Bhavsar
+    6. Jaideep Panchal
+    ''')
     st.markdown("""
-        This project is a web application that allows users to select various life expectancy graphs using Plotly from a dropdown. 
-        The graphs display life expectancy data for different countries over time. The application was built using the Streamlit library 
+        This project is a web application that allows users to select various Longevity Potential graphs using Plotly from a dropdown. 
+        The graphs display Longevity Potential data for different countries over time. The application was built using the Streamlit library 
         for Python.
     """)
     
@@ -70,15 +95,26 @@ def about():
 
 def gender():
 
-    st.title("Using Gender as Proxy for Life Expectancy")
+    st.title("Using Gender as Proxy for Longevity Potential")
     st.write()
-    st.markdown("""
-    By analyzing the trends and patterns in life expectancy curves over time, we can gain insights into major world events and their impact on global health. 
 
-    Similarly, the sharp decline in life expectancy during the AIDS epidemic in the 1980s and 1990s was a reflection of the devastating impact of the disease on communities around the world. More recently, the COVID-19 pandemic has caused a significant increase in mortality rates, particularly among older adults and those with underlying health conditions.
+    data_f = data[data['year'] == 2020]
+    # Count the number of countries in each development status category
+    country_counts = data_f['development_status'].value_counts()
+    # Create pie chart
+    o1, o2 = st.columns([1,1])
+    with o1:
+        st.markdown("""
+        By analyzing the trends and patterns in Longevity Potential curves over time, we can gain insights into major world events and their impact on global health. 
 
-    """)
-    st.markdown("Use the dropdown to compare life expectancy of various countries:")
+        Similarly, the sharp decline in Longevity Potential during the AIDS epidemic in the 1980s and 1990s was a reflection of the devastating impact of the disease on communities around the world. More recently, the COVID-19 pandemic has caused a significant increase in mortality rates, particularly among older adults and those with underlying health conditions.
+        Globally: Longevity Potential has increased by more than 20 years between 1960 and 2020, from an average of 52.6 years in 1960 to 73.2 years in 2020. This is largely due to improvements in healthcare, sanitation, nutrition, and living standards.
+        """)
+    with o2:
+        fig = px.pie(values=country_counts, names=country_counts.index, title='Countries by Development Status latest by 2020',height = 400)
+        st.plotly_chart(fig)
+
+    st.markdown("Use the dropdown to compare Longevity Potential of various countries:")
     # Create dropdown for country selection
     countries = st.multiselect('Select countries', data['country'].unique(), default=['India','China','Pakistan','Bangladesh'])
     filtered_data = data[data['country'].isin(countries)]
@@ -95,15 +131,15 @@ def gender():
 
     # In the second column, display the Plotly graph
     with col2:
-        fig = px.line(filtered_data, x='year', y='life_expectancy', color='country', title='Life Expectancy Comparison')
+        fig = px.line(filtered_data, x='year', y='life_expectancy', color='country', title='Longevity Potential Comparison')
         st.plotly_chart(fig,use_container_width=True)
 
     #graph 1
-    st.markdown("The reason for the greater life expectancy of females as compared to males can be attributed to multiple factors, such as biology, lifestyle, and societal factors. Biological factors include differences in hormonal makeup, genetics, and immune systems, with females generally having a stronger immune system than males. Lifestyle factors such as diet, exercise, and smoking can also have an impact on life expectancy, with women typically having healthier lifestyle choices. Additionally, societal factors such as occupation, access to healthcare, and cultural norms can also influence life expectancy. Overall, while the exact reasons for the difference in life expectancy between males and females may vary depending on the context, it is clear that there are a multitude of factors that contribute to this difference.")
+    st.markdown("The reason for the greater Longevity Potential of females as compared to males can be attributed to multiple factors, such as biology, lifestyle, and societal factors. Biological factors include differences in hormonal makeup, genetics, and immune systems, with females generally having a stronger immune system than males. Lifestyle factors such as diet, exercise, and smoking can also have an impact on Longevity Potential, with women typically having healthier lifestyle choices. Additionally, societal factors such as occupation, access to healthcare, and cultural norms can also influence Longevity Potential. Overall, while the exact reasons for the difference in Longevity Potential between males and females may vary depending on the context, it is clear that there are a multitude of factors that contribute to this difference.")
     kol1, kol2 = st.columns([1, 2])
     with kol2:
         grouped_data = data.groupby(['country', 'year']).mean().reset_index()
-        d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Life Expectancy Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
+        d1 = px.line(grouped_data, x='year', y=['male_life_expectancy', 'female_life_expectancy'], title='Year by Year Longevity Potential Comparison (Male vs Female)', animation_frame='country', range_y=[data['life_expectancy'].min(), data['life_expectancy'].max()], color_discrete_map={'male_life_expectancy': 'blue', 'female_life_expectancy': 'red'})
         d1.update_layout(
             legend=dict(
             orientation='h',
@@ -121,26 +157,37 @@ def gender():
 
     st.markdown("""
     ##### __Nation-wise Inferences from the above graph__
-    - Bangladesh's life expectancy decreased in 1972 due to a devastating famine that occurred in the country from 1971 to 1974. The famine was a result of a combination of factors, including natural disasters such as floods and cyclones, political instability following the country's independence from Pakistan in 1971, and economic difficulties resulting from the war.
-    - Afghanistan had the lowest life expectancy in 1984 due to a combination of factors, including ongoing conflict, political instability, and limited access to basic healthcare and nutrition. And as they were constantly in conflict with USSR.
-    - n 1970, Equatorial Guinea gained independence from Spain, but political instability followed, with a series of coups and political repression. The combination of political instability, economic underdevelopment, and poor healthcare infrastructure contributed to low life expectancy in Equatorial Guinea during this period. 
-    - holera epidemic in Peru in 1970 caused life expectancy dip.
-    - The fragmentation of Soviet Union in 1990s caused low life expectancy in Russia for the years upcoming. And due to constant poor diet in the country, its life expectancy remained stagnant especially for the male counterparts.
+    - South Africa: During the height of the HIV/AIDS epidemic in the 1990s and 2000s, life expectancies in South Africa declined significantly, particularly among women. At its lowest point in 2005, Longevity Potential in South Africa was just 52 years.
+    - Zimbabwe has experienced several economic crises over the past few decades, resulting in a decline in Longevity Potential. For example, during the economic crisis in the early 2000s, life expectancies in the country dropped from around 60 years to just 44 years.
+    - In beginning of 2011, Syria descended into a brutal civil war that has lasted for more than a decade. The war has had a devastating impact on the country's population, with hundreds of thousands of people killed and millions displaced. The conflict has also had a significant impact on life expectancies in the country.
+    - Bangladesh's Longevity Potential decreased in 1972 due to a devastating famine that occurred in the country from 1971 to 1974. The famine was a result of a combination of factors, including natural disasters such as floods and cyclones, political instability following the country's independence from Pakistan in 1971, and economic difficulties resulting from the war.
+    - Afghanistan had the lowest Longevity Potential in 1984 due to a combination of factors, including ongoing conflict, political instability, and limited access to basic healthcare and nutrition. And as they were constantly in conflict with USSR.
+    - In 1970, Equatorial Guinea gained independence from Spain, but political instability followed, with a series of coups and political repression. The combination of political instability, economic underdevelopment, and poor healthcare infrastructure contributed to low Longevity Potential in Equatorial Guinea during this period. 
+    - Cholera epidemic in Peru in 1970 caused Longevity Potential dip.
+    - Gibraltar is a unique case because it has a small population and is heavily influenced by the economy and healthcare system of neighboring Spain, which has a relatively high Longevity Potential.
+    - The fragmentation of Soviet Union in 1990s caused low Longevity Potential in Russia for the years upcoming. And due to constant poor diet in the country, its Longevity Potential remained stagnant especially for the male counterparts.
     """)
 
-    life_expectancy = pd.melt(data, id_vars=['country', 'development_status'], value_vars=['male_life_expectancy', 'female_life_expectancy'], var_name='gender', value_name='life_expectancy')
-    d2 = px.box(life_expectancy, height=600, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
-    d2.update_layout(title='Comparison of Male and Female Life Expectancy by Development Status', xaxis_title='Life Expectancy', yaxis_title='Development Status')
-    st.plotly_chart(d2,use_container_width=True)
+    # Sidebar for year selection
+    year = st.selectbox('Select a year:', options=data['year'].unique())
+
+    # Filter data based on year selection
+    life_expectancy = pd.melt(data[data['year'] == year], id_vars=['country', 'development_status'], value_vars=['male_life_expectancy', 'female_life_expectancy'], var_name='gender', value_name='life_expectancy')
+
+    # Plot the data
+    fig = px.box(life_expectancy, height=600, template='plotly_dark', y='development_status', x='life_expectancy', color='gender', hover_name='country')
+    fig.update_layout(title=f'Comparison of Male and Female Longevity Potential by Development Status ({year})', xaxis_title='Longevity Potential', yaxis_title='Development Status')
+    st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("""
-        The dispersion of male and female life expectancy can vary across different income groups of countries. In developed countries, the difference between male and female life expectancy is generally smaller, with both genders having higher life expectancies compared to developing countries. This is attributed to better access to healthcare facilities, advanced medical technologies, and higher standards of living in developed countries.
+        The dispersion of male and female Longevity Potential can vary across different income groups of countries. In developed countries, the difference between male and female Longevity Potential is generally smaller, with both genders having higher life expectancies compared to developing countries. This is attributed to better access to healthcare facilities, advanced medical technologies, and higher standards of living in developed countries.
 
-        In developing countries, the dispersion between male and female life expectancy can be significant, with females generally having higher life expectancies compared to males. This can be attributed to factors such as better access to healthcare and education for females in some developing countries, as well as cultural and social practices that favor female health and wellbeing.
+        In developing countries, the dispersion between male and female Longevity Potential can be significant, with females generally having higher life expectancies compared to males. This can be attributed to factors such as better access to healthcare and education for females in some developing countries, as well as cultural and social practices that favor female health and wellbeing.
 
-        In lower middle-income countries, the gap between male and female life expectancy can be larger compared to developing countries, but smaller compared to low-income countries. This can be attributed to a lack of access to healthcare facilities and education, limited access to clean water and sanitation, and higher rates of poverty and malnutrition in lower middle-income countries.
+        In lower middle-income countries, the gap between male and female Longevity Potential can be larger compared to developing countries, but smaller compared to low-income countries. This can be attributed to a lack of access to healthcare facilities and education, limited access to clean water and sanitation, and higher rates of poverty and malnutrition in lower middle-income countries.
 
-        In low-income countries, the difference between male and female life expectancy is generally the largest, with females having significantly higher life expectancies compared to males. This can be attributed to a range of factors including limited access to healthcare facilities, higher rates of poverty and malnutrition, limited access to education and information, and gender inequalities that affect women's health outcomes.
+        In low-income countries, the difference between male and female Longevity Potential is generally the largest, with females having significantly higher life expectancies compared to males. This can be attributed to a range of factors including limited access to healthcare facilities, higher rates of poverty and malnutrition, limited access to education and information, and gender inequalities that affect women's health outcomes.
+        Gender differences: There has been a significant reduction in the gender gap in Longevity Potential over the past 60 years. In 1960, women generally lived longer than men by about five years on average. However, by 2020, this gap had narrowed to around two years.
         """)
 
     # Load the data from a CSV file
@@ -161,23 +208,23 @@ def gender():
     # Display the chart in Streamlit
     st.plotly_chart(chart,use_container_width=True)
 
-    st.markdown("The inequality in years of life between people within the same country can be measured in the same way that we measure, for example, the inequality in the distribution of incomes. The idea is to estimate the extent to which a small share of a country’s population concentrates a large ‘stock of health’, hence living much longer than most of the population in the same country. The following visualization presents estimates of the inequality of lifetimes as measured by the Gini coefficient. A high Gini coefficient here means a very unequal distribution of years of life – that is, large within-country inequalities of the number of years that people live.")
+    st.markdown("The Gini index ranges from 0 to 1, with 0 indicating perfect equality (i.e., everyone has the same income) and 1 indicating perfect inequality (i.e., one person has all the income). The inequality in years of life between people within the same country can be measured in the same way that we measure, for example, the inequality in the distribution of incomes. The idea is to estimate the extent to which a small share of a country’s population concentrates a large ‘stock of health’, hence living much longer than most of the population in the same country. The following visualization presents estimates of the inequality of lifetimes as measured by the Gini coefficient. A high Gini coefficient here means a very unequal distribution of years of life – that is, large within-country inequalities of the number of years that people live.")
 
 def sanitation():
-    st.title("Sanitation and Life Expectancy")
+    st.title("Sanitation and Longevity Potential")
     col1, col2 = st.columns([1, 3])
     st.markdown("""
-    Sanitation and life expectancy are two critical factors that affect the health of individuals and populations. The provision of adequate sanitation facilities can help prevent the spread of infectious diseases, which can have a significant impact on life expectancy.
+    Sanitation and Longevity Potential are two critical factors that affect the health of individuals and populations. The provision of adequate sanitation facilities can help prevent the spread of infectious diseases, which can have a significant impact on Longevity Potential.
     """)
     cmx = px.imshow(data[['life_expectancy','sanitation_mortality_rate','physicians']].corr(),text_auto=True, width=400)
 
     cmx.update_layout(coloraxis_colorbar=dict(x=.4, y=1.2, len=0.8, yanchor='top', orientation='h'))
     st.plotly_chart(cmx, use_container_width=True)
     st.markdown('''
-    This can be seen in the Sanitation and Life Expectancy plot, which visualizes the correlation between sanitation mortality rate, life expectancy, and physicians. The plot shows that countries with higher sanitation mortality rates tend to have lower life expectancies, highlighting the importance of access to clean water and adequate sanitation facilities.
+    This can be seen in the Sanitation and Longevity Potential plot, which visualizes the correlation between sanitation mortality rate, Longevity Potential, and physicians. The plot shows that countries with higher sanitation mortality rates tend to have lower life expectancies, highlighting the importance of access to clean water and adequate sanitation facilities.
 
     ''')
-    # Define the ranges for sanitation mortality rate and life expectancy
+    # Define the ranges for sanitation mortality rate and Longevity Potential
     sanitation_bins = [-1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
     life_expectancy_bins = [0, 50, 60, 70, 80, 90, 100]
 
@@ -207,17 +254,17 @@ def sanitation():
     ))])
 
     # Add labels to the nodes
-    s1.update_layout(title='<b>Sankey Diagram</b> of Sanitation Mortality Rate <i>(left)</i> vs Life Expectancy <i>(right)</i>',    xaxis_title = "X-Axis Label",
+    s1.update_layout(title='<b>Sankey Diagram</b> of Sanitation Mortality Rate <i>(left)</i> vs Longevity Potential <i>(right)</i>',    xaxis_title = "X-Axis Label",
     yaxis_title = "Y-Axis Label")
     st.plotly_chart(s1,use_container_width=True)
     st.markdown('''
-    The Sankey diagram in the plot also demonstrates the relationship between sanitation mortality rate and life expectancy by grouping countries into bins based on their sanitation mortality rate and life expectancy. The diagram illustrates the flow of countries from one bin to another based on their sanitation mortality rate and life expectancy, providing a visual representation of the relationship between these factors.
+    The Sankey diagram in the plot also demonstrates the relationship between sanitation mortality rate and Longevity Potential by grouping countries into bins based on their sanitation mortality rate and Longevity Potential. The diagram illustrates the flow of countries from one bin to another based on their sanitation mortality rate and Longevity Potential, providing a visual representation of the relationship between these factors.
     ''')
 
     s2 = px.scatter(data, x='life_expectancy', y='sanitation_mortality_rate', 
                  color='development_status',
                  hover_name='country', log_y=True, template='plotly_dark',
-                 labels={'life_expectancy': 'Life Expectancy',
+                 labels={'life_expectancy': 'Longevity Potential',
                          'sanitation_mortality_rate': 'Sanitation Mortality Rate',
                          'urban_population': 'Urban Population'},
                  facet_col='development_status')
@@ -227,9 +274,9 @@ def sanitation():
                   font=dict(family='Arial', size=12),
                   plot_bgcolor='rgba(0, 0, 0, 0)',
                   paper_bgcolor='rgba(0, 0, 0, 0)',
-                  title=dict(text='<b>Sanitation Mortality Rate<b> vs Life Expectancy by Development Status',
+                  title=dict(text='<b>Sanitation Mortality Rate<b> vs Longevity Potential by Development Status',
                              font=dict(size=20)),
-                  xaxis=dict(title='Life Expectancy', 
+                  xaxis=dict(title='Longevity Potential', 
                              titlefont=dict(family='Arial', size=16),
                              tickfont=dict(family='Arial', size=14)),
                   yaxis=dict(title='Sanitation Mortality Rate',
@@ -240,38 +287,38 @@ def sanitation():
     tempDF = data.dropna(subset=['physicians'])
     fig = px.scatter(tempDF,template='plotly_dark', x='healthcare_spending', y='life_expectancy',
                     color='development_status', hover_name='country', size='physicians',
-                    log_x=True, title="Analyzing <b>Healthcare Spending</b> and Life Expectancy")
+                    log_x=True, title="Analyzing <b>Healthcare Spending</b> and Longevity Potential")
     fig.update_yaxes(range=[35, 90])
     st.plotly_chart(fig,use_container_width=True)
-    st.markdown('''Furthermore, the scatter plot in the Sanitation and Life Expectancy plot shows that life expectancy tends to increase as sanitation mortality rates decrease, and this trend holds across different levels of development status. This reinforces the importance of sanitation facilities in promoting better health outcomes and improving life expectancy.
+    st.markdown('''Furthermore, the scatter plot in the Sanitation and Longevity Potential plot shows that Longevity Potential tends to increase as sanitation mortality rates decrease, and this trend holds across different levels of development status. This reinforces the importance of sanitation facilities in promoting better health outcomes and improving Longevity Potential.
     ''')
     from plotly.subplots import make_subplots
-    # Calculate average number of physicians and life expectancy by development status
+    # Calculate average number of physicians and Longevity Potential by development status
     physicians_and_life_exp_by_status = data.groupby('development_status').agg({'physicians': 'mean', 'life_expectancy': 'mean'}).reset_index()
     physicians_and_life_exp_by_status = physicians_and_life_exp_by_status.sort_values(by='physicians')
 
     # Create subplot figure with two vertical subplots
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    # Add bar traces for physicians and life expectancy
+    # Add bar traces for physicians and Longevity Potential
     fig.add_trace(go.Bar(x=physicians_and_life_exp_by_status['development_status'], y=physicians_and_life_exp_by_status['physicians'],
                         name='Number of Physicians'), secondary_y=False)
     fig.add_trace(go.Line(x=physicians_and_life_exp_by_status['development_status'], y=physicians_and_life_exp_by_status['life_expectancy'],
-                        name='Life Expectancy'), secondary_y=True)
+                        name='Longevity Potential'), secondary_y=True)
 
     # Update layout and axis titles
-    fig.update_layout(title='Average Number of Physicians and Life Expectancy by Development Status', 
+    fig.update_layout(title='Average Number of Physicians and Longevity Potential by Development Status', 
                     xaxis_title='Development Status', yaxis_title='Number of Physicians',template='plotly_dark'  ,
-                    yaxis2_title='Life Expectancy')
+                    yaxis2_title='Longevity Potential')
 
     # Show the plot
     st.plotly_chart(fig,use_container_width=True)
     st.markdown('''
-    In conclusion, the Sanitation and Life Expectancy plot emphasizes the critical role that sanitation plays in promoting better health outcomes and improving life expectancy. The plot demonstrates that access to clean water and sanitation facilities is essential for maintaining good health and wellbeing, and highlights the need for continued efforts to improve sanitation infrastructure globally.
+    In conclusion, the Sanitation and Longevity Potential plot emphasizes the critical role that sanitation plays in promoting better health outcomes and improving Longevity Potential. The plot demonstrates that access to clean water and sanitation facilities is essential for maintaining good health and wellbeing, and highlights the need for continued efforts to improve sanitation infrastructure globally.
     ''')
 
 def carbon_emissions():
-    st.title('GDP Per Capita and Carbon Emission influencing Life Expectancy')
+    st.title('GDP Per Capita and Carbon Emission influencing Longevity Potential')
     carbon1, carbon2 = st.columns([0.8,1])
     with carbon1:
         cmx = px.imshow(data[['life_expectancy','GDP_per_capita','carbon_emissions']].corr(),text_auto=True, width=400)
@@ -279,10 +326,10 @@ def carbon_emissions():
         st.plotly_chart(cmx,use_container_width=True)
         
     with carbon2:
-        st.markdown("""There is a positive correlation between both GDP per capita and carbon emissions and life expectancy, which means that as GDP per capita and carbon emissions increase, so does life expectancy. The correlation coefficient between life expectancy and GDP per capita is +0.54, while the correlation coefficient between life expectancy and carbon emissions is +0.53. These coefficients indicate a moderate positive correlation between these variables and life expectancy.
+        st.markdown("""There is a positive correlation between both GDP per capita and carbon emissions and Longevity Potential, which means that as GDP per capita and carbon emissions increase, so does Longevity Potential. The correlation coefficient between Longevity Potential and GDP per capita is +0.54, while the correlation coefficient between Longevity Potential and carbon emissions is +0.53. These coefficients indicate a moderate positive correlation between these variables and Longevity Potential.
         """)
         st.markdown("""
-        The reason why there is a positive correlation between GDP per capita and life expectancy is that higher economic output typically leads to better access to healthcare, education, and sanitation, which can improve overall health and longevity. Similarly, the positive correlation between carbon emissions and life expectancy can be explained by the fact that carbon emissions are often associated with industrialization and economic development, which can lead to improved living conditions and better access to healthcare.
+        The reason why there is a positive correlation between GDP per capita and Longevity Potential is that higher economic output typically leads to better access to healthcare, education, and sanitation, which can improve overall health and longevity. Similarly, the positive correlation between carbon emissions and Longevity Potential can be explained by the fact that carbon emissions are often associated with industrialization and economic development, which can lead to improved living conditions and better access to healthcare.
         """)
 
     st.markdown("""
@@ -322,12 +369,23 @@ def carbon_emissions():
     )
 
     st.plotly_chart(fig, use_container_width=True)
+    year = st.selectbox('Select a year:', options=data['year'].unique())
+    tempDF = data[data['year'] == year]
+    mean_value = data['schooling'].mean()
+    data['schooling'] = data['schooling'].fillna(value=mean_value)
+    c1 = px.scatter(tempDF, x="carbon_emissions", y="life_expectancy", hover_data=['country'],color="development_status", template='plotly_dark',
+                 title="Relationship Between <b>Longevity Potential and Carbon Emissions</b> Per Capita by Development Status", log_x=True, width=1100,
+                 marginal_y='histogram')
+    
+    st.plotly_chart(c1, use_container_width=True)
+
     tempDF = data[data['year'] > 2000]
     mean_value = data['schooling'].mean()
     data['schooling'] = data['schooling'].fillna(value=mean_value)
-    c1 = px.scatter(tempDF, x="carbon_emissions", y="life_expectancy", color="development_status", template='plotly_dark',
-                 title="<i>After 2000</i> | Relationship Between <b>Life Expectancy and Carbon Emissions</b> Per Capita by Development Status", log_x=True, width=1100,
+    c1 = px.scatter(tempDF, x="carbon_emissions", y="life_expectancy", hover_data=['country'],color="development_status", template='plotly_dark',
+                 title="Cummulative Graph After 2000 | Relationship Between <b>Longevity Potential and Carbon Emissions</b> Per Capita by Development Status", log_x=True, width=1100,
                  marginal_y='histogram')
+    
     st.plotly_chart(c1, use_container_width=True)
 
     st.markdown("""
@@ -342,9 +400,21 @@ def carbon_emissions():
 
     h1 = px.scatter(data, x='year',marginal_y= 'box' ,y='GDP_per_capita',log_y=True ,color='development_status',template='plotly_dark', hover_data=['country'], width=1100)
     st.plotly_chart(h1,use_container_width=True)
+    pie1,  pie2 = st.columns([1,1])
+    with pie1:
+        healthcare_data = data[data['year'] == 2000]
+        fig = px.pie(healthcare_data, values='healthcare_spending', names='development_status', title='2000 | Healthcare Spending by Development Status')
+        st.plotly_chart(fig, use_container_width=True)
+    with pie2:
+        healthcare_data = data[data['year'] == 2019]
+        fig = px.pie(healthcare_data, values='healthcare_spending', names='development_status', title='2020 | Healthcare Spending by Development Status')
+        st.plotly_chart(fig, use_container_width=True)
+    st.markdown('''
+    The chart can be used to make inferences about the distribution of healthcare spending across different development statuses. For example, we can see from the chart that High income countries spend the most on healthcare, followed by Upper middle income countries, and then Lower middle income countries. Low income countries spend the least on healthcare. This information can be useful in identifying areas that may require additional support or resources for healthcare development.
+    ''')
    
 def obesity_prevalence():
-        st.title('Obesity Prevalence and Life Expectancy')
+        st.title('Obesity Prevalence and Longevity Potential')
         o1, o0, o2 = st.columns([1.2,0.1,1])
         o1.markdown("""
         <style>
@@ -354,6 +424,10 @@ def obesity_prevalence():
         </style>
         """,
         unsafe_allow_html=True)
+        countries = st.multiselect('Select countries', data['country'].unique(), default=['United States','Japan','India','Pakistan'])
+        filtered_data = data[data['country'].isin(countries)]
+        fig = px.line(filtered_data, x='year', y='obesity_prevalence', color='country', title='Obesity Prevalence by Country')
+        st.plotly_chart(fig,use_container_width=True)
         with o1:
             fig = px.histogram(data, x='obesity_prevalence', histnorm='density', color='development_status', marginal='rug')
             fig.update_layout(
@@ -373,19 +447,21 @@ def obesity_prevalence():
             st.plotly_chart(cmx)
 
         st.markdown("""
-        There is a positive correlation of 0.72 between obesity prevalence and life expectancy, indicating that there is a moderate relationship between the two variables. This means that as obesity prevalence increases, so does life expectancy. 
+        There is a positive correlation of 0.72 between obesity prevalence and Longevity Potential, indicating that there is a moderate relationship between the two variables. This means that as obesity prevalence increases, so does Longevity Potential. 
         
-        This may seem counterintuitive, but it could be due to the fact that some of the factors that lead to higher obesity prevalence, such as access to better healthcare and a higher standard of living, may also lead to higher life expectancy.""")
+        This may seem counterintuitive, but it could be due to the fact that some of the factors that lead to higher obesity prevalence, such as access to better healthcare and a higher standard of living, may also lead to higher Longevity Potential.""")
 
         df1 = data.copy()
         df1 = df1.dropna(subset=['obesity_prevalence'])
         fig = px.scatter(df1,template='plotly_dark', x='GDP_per_capita', y='life_expectancy', size='obesity_prevalence',
                         color='obesity_prevalence', trendline='ols', hover_name='country',
-                        log_x=True, size_max=30, title="Analyzing <b>Obesity Prevalance</b> with GDP per capita and Life Expectancy")
+                        log_x=True, size_max=30, title="Analyzing <b>Obesity Prevalance</b> with GDP per capita and Longevity Potential")
         st.plotly_chart(fig,use_container_width=True)
         st.markdown("""
                In terms of differences between development status categories, we can see that obesity prevalence is generally highest in developed countries, followed by developing, lower middle income, and low-income countries, in that order. This trend is consistent across all years in the dataset. The density plots show that obesity prevalence in developed countries is more spread out and has a higher peak compared to other development status categories, indicating that there are more people in developed countries who are severely obese.
         """)
+
+
 
 
 def corr_matrix():
@@ -394,19 +470,47 @@ def corr_matrix():
     corr1 = px.imshow(data_corr.corr(),color_continuous_scale=px.colors.sequential.Viridis,text_auto=True, title='HeatMap : To show correlation in between the <b>relevant features</b>')
     corr1.update_layout(height = 800,width = 1200,)
     st.markdown("""
-    Upon analyzing the correlation matrix, it is evident that healthcare spending exhibits a strong positive correlation (0.64) with life expectancy. Additionally, GDP per capita (0.54) and carbon emissions (0.53) exhibit considerable correlation with life expectancy. These correlations will be further explored and visualized in the graphs to gain more insights.
+    Upon analyzing the correlation matrix, it is evident that healthcare spending exhibits a strong positive correlation (0.64) with Longevity Potential. Additionally, GDP per capita (0.54) and carbon emissions (0.53) exhibit considerable correlation with Longevity Potential. These correlations will be further explored and visualized in the graphs to gain more insights.
 
-    Contrary to popular belief, obesity prevalence (0.72) - an obvious negative factor in decreasing life expectancy - exhibits a positive correlation with life expectancy. This suggests that there may be various other latent factors that influence life expectancy. The number of physicians per 1000 people (0.65) also has a positive correlation with life expectancy, which highlights the pivotal role of healthcare infrastructure in determining life expectancy.  
+    Contrary to popular belief, obesity prevalence (0.72) - an obvious negative factor in decreasing Longevity Potential - exhibits a positive correlation with Longevity Potential. This suggests that there may be various other latent factors that influence Longevity Potential. The number of physicians per 1000 people (0.65) also has a positive correlation with Longevity Potential, which highlights the pivotal role of healthcare infrastructure in determining Longevity Potential.  
 
     """)
+
+
 
     st.plotly_chart(corr1,use_container_width=True)
     st.markdown("""
-    Education also plays a significant role in improving life expectancy, as evidenced by the strong positive correlation with schooling (0.72). On the other hand, mortality rate due to poor sanitation (per 1000) exhibits a negative but influential correlation (-0.84) with life expectancy. This indicates that ensuring basic sanitation facilities can significantly improve life expectancy. Furthermore, the percentage of the population migrating to urban areas (0.73) has a greater life expectancy compared to the rural population, which exhibits an inverse correlation (-0.73). 
+    Education also plays a significant role in improving Longevity Potential, as evidenced by the strong positive correlation with schooling (0.72). On the other hand, mortality rate due to poor sanitation (per 1000) exhibits a negative but influential correlation (-0.84) with Longevity Potential. This indicates that ensuring basic sanitation facilities can significantly improve Longevity Potential. Furthermore, the percentage of the population migrating to urban areas (0.73) has a greater Longevity Potential compared to the rural population, which exhibits an inverse correlation (-0.73). 
     
-    This highlights the importance of urbanization in improving the overall health and well-being of individuals. Lastly, the percentage of the population meeting basic sanitation (0.71) exhibits a positive correlation with life expectancy. However, unemployment (0.48), mobile cell subscription (0.50), and GINI Index (-0.36) have little to no effect on life expectancy, and therefore, may be dropped from the dataset
+    This highlights the importance of urbanization in improving the overall health and well-being of individuals. Lastly, the percentage of the population meeting basic sanitation (0.71) exhibits a positive correlation with Longevity Potential. However, unemployment (0.48), mobile cell subscription (0.50), and GINI Index (-0.36) have little to no effect on Longevity Potential, and therefore, may be dropped from the dataset
     """)
-    
+
+    # Calculate correlation matrix
+    corr_matrix = data.corr()
+
+    # Sort the correlation coefficients in descending order
+    corr_values = corr_matrix['life_expectancy'].drop('life_expectancy').sort_values(ascending=False)
+
+    # Create a bar chart with the correlation coefficients
+    fig = go.Figure(go.Bar(
+                x=corr_values.index,
+                y=corr_values,
+                marker={'color': corr_values.apply(lambda x: 'green' if x >= 0 else 'red')},
+                text=corr_values.apply(lambda x: f'{x:.2f}'),
+                textposition='outside',
+            ))
+
+    # Set the title and axis labels
+    fig.update_layout(
+                height = 500,
+                title=f"Correlation of Longevity Potential with Other Variables",
+                xaxis_title="Variable",
+                yaxis_title="Correlation Coefficient",
+            )
+
+    # Display the figure
+    st.plotly_chart(fig, use_container_width=True)
+
     st.markdown("""
     ##### Here is the summary of indicators analyzed:
     1. `life_expectancy` (SP.DYN.LE00.IN):The average number of years a newborn is expected to live if mortality patterns at the time of its birth remain constant in the future.
@@ -494,7 +598,7 @@ def ml_model():
             input_values[feature] = value
         return input_values
 
-# Define a function to preprocess the input data
+    # Define a function to preprocess the input data
     def preprocess_data(input_values):
         data = pd.DataFrame([input_values])
         data = data[['healthcare_spending', 'GDP_per_capita', 'obesity_prevalence', 
@@ -505,21 +609,20 @@ def ml_model():
 
 
     # Set page header
-    st.write('# Life Expectancy Prediction ML App')
-    st.write('The model developed predicts life expectancy based on various indicators such as healthcare spending, GDP per capita, and obesity prevalence. It uses advanced machine learning techniques to make accurate predictions while handling missing data and excluding development status. The model has a high R² score of 0.94, which means that it can explain 94% of the variance in the target variable, making it a very good result for a regression model. This means that the model can accurately predict life expectancy for different countries based on their socio-economic and healthcare indicators..')
+    st.write('# Longevity Potential Prediction ML App')
+    st.write('The model developed predicts Longevity Potential based on various indicators such as healthcare spending, GDP per capita, and obesity prevalence. It uses advanced machine learning techniques to make accurate predictions while handling missing data and excluding development status. The model has a high R² score of 0.94, which means that it can explain 94% of the variance in the target variable, making it a very good result for a regression model. This means that the model can accurately predict Longevity Potential for different countries based on their socio-economic and healthcare indicators..')
     # Get the input values from the user
     input_values = get_input_values()
-    if st.button("Predict Life Expectancy"):
-        
+    if st.button("Predict Longevity Potential"):
         # Preprocess the input data
         data = preprocess_data(input_values)
         prediction = rf.predict(data)
-        st.write('## Predicted Life Expectancy')
+        st.write('## Predicted Longevity Potential')
         st.write(f'{np.round(prediction[0], 1)} years')
 
 def schooling():
     import plotly.express as px
-    st.title("Schooling in Countries and Life Expectancy")
+    st.title("Schooling in Countries and Longevity Potential")
     st.markdown('The schooling in primary, secondary and higher level education on average shows a good moderately-positive relation of +0.72. Hence, the number of years an individual on average spents in gaining education, helps him to achieve the certain upksilled lifestyle which enables for a sustainable life ahead.')
     s1, s2 = st.columns([2,1])
     with s1:
@@ -536,18 +639,18 @@ def schooling():
     st.markdown('Here is the cumulative summation of years on y-axis and development status of each country on x-axis. We can clearly see the similar trend of education for ')
     fig = px.scatter(data, x='schooling', y='life_expectancy', color='development_status', width=1000, log_x=True,
                  hover_data=['country', 'year', 'healthcare_spending', 'obesity_prevalence'],
-                 title='Relationship between Schooling and Life Expectancy by Income Group')
+                 title='Relationship between Schooling and Longevity Potential by Income Group')
     st.plotly_chart(fig)
     st.markdown('''
-    The graph is a scatter plot that shows the relationship between schooling and life expectancy, with each dot representing a country. The x-axis represents the average number of years of schooling, while the y-axis represents the life expectancy at birth in years. The color of the dots indicates the development status of the country, with developed countries in blue, developing countries in orange, lower-middle-income countries in green, and low-income countries in red.
+    The graph is a scatter plot that shows the relationship between schooling and Longevity Potential, with each dot representing a country. The x-axis represents the average number of years of schooling, while the y-axis represents the Longevity Potential at birth in years. The color of the dots indicates the development status of the country, with developed countries in blue, developing countries in orange, lower-middle-income countries in green, and low-income countries in red.
 
-    The graph suggests a strong positive correlation between schooling and life expectancy, with countries that have higher levels of schooling also having higher life expectancies. Additionally, the graph shows that developed countries generally have higher levels of schooling and life expectancy than developing countries and lower-income countries.
+    The graph suggests a strong positive correlation between schooling and Longevity Potential, with countries that have higher levels of schooling also having higher life expectancies. Additionally, the graph shows that developed countries generally have higher levels of schooling and Longevity Potential than developing countries and lower-income countries.
 
-    The hover data on the graph provides additional information about each country, including healthcare spending and obesity prevalence, which may be useful in further analyzing the relationship between schooling and life expectancy.
+    The hover data on the graph provides additional information about each country, including healthcare spending and obesity prevalence, which may be useful in further analyzing the relationship between schooling and Longevity Potential.
     ''')
 
 # Set up navigation
-nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Life Expectancy","Carbon Emissions and Life Expectancy","Sanitation and Life Expectancy","Schooling and Life Expectancy","Obesity Prevalence and Life Expectancy","About Us","ML Model"])
+nav = st.sidebar.radio("Navigation", ["Home","Relevant Features of Dataset", "Gender and Longevity Potential","Carbon Emissions and Longevity Potential","Sanitation and Longevity Potential","Schooling and Longevity Potential","Obesity Prevalence and Longevity Potential","About Us","ML Model"])
 st.sidebar.image("developed.png", use_column_width=True)
 # Show appropriate page based on selection
 if nav == "Home":
@@ -556,17 +659,17 @@ elif nav == "Relevant Features of Dataset":
     corr_matrix()
 elif nav == "ML Model":
     ml_model()
-elif nav == "Schooling and Life Expectancy":
+elif nav == "Schooling and Longevity Potential":
     schooling()
 elif nav == "About Us":
     about()
-elif nav == "Gender and Life Expectancy":
+elif nav == "Gender and Longevity Potential":
     gender()
-elif nav == "Carbon Emissions and Life Expectancy":
+elif nav == "Carbon Emissions and Longevity Potential":
     carbon_emissions()
-elif nav == "Sanitation and Life Expectancy":
+elif nav == "Sanitation and Longevity Potential":
     sanitation()
-elif nav == "Obesity Prevalence and Life Expectancy":
+elif nav == "Obesity Prevalence and Longevity Potential":
     obesity_prevalence()
 else:
     pass
